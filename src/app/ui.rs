@@ -1,4 +1,4 @@
-use super::GraphicDemo;
+use super::{ChosenCamera, FillingType, GraphicDemo};
 use crate::consts::*;
 use egui::*;
 impl eframe::App for GraphicDemo {
@@ -26,6 +26,12 @@ impl eframe::App for GraphicDemo {
                 .ctx()
                 .load_texture("sphere", bitmap, egui::TextureFilter::Linear);
             img_ui.image(texture, texture.size_vec2());
+            Frame::popup(ui.style())
+                .stroke(Stroke::none())
+                .show(ui, |ui| {
+                    ui.set_max_width(270.0);
+                    CollapsingHeader::new("Settings").show(ui, |ui| self.options_ui(ui));
+                })
         });
     }
 }
@@ -33,5 +39,24 @@ impl eframe::App for GraphicDemo {
 impl GraphicDemo {
     pub fn new(_cc: &eframe::CreationContext<'_>) -> Self {
         Default::default()
+    }
+    fn options_ui(&mut self, ui: &mut Ui) {
+        let Self {
+            chosen_camera,
+            filling_type,
+            light_rotation,
+        } = self;
+        ui.label("Camera rotation degree");
+        ui.add(egui::Slider::new(light_rotation, 0f32..=359f32).text("camera rotation angle"));
+        ui.separator();
+        ui.label("Chose the camera");
+        ui.radio_value(&mut *chosen_camera, ChosenCamera::Static, "Static");
+        ui.radio_value(&mut *chosen_camera, ChosenCamera::Moving, "Moving");
+        ui.radio_value(&mut *chosen_camera, ChosenCamera::Following, "Following");
+        ui.separator();
+        ui.label("Chose the filling type");
+        ui.radio_value(&mut *filling_type, FillingType::Constant, "Constant");
+        ui.radio_value(&mut *filling_type, FillingType::Gouraud, "Gouraud");
+        ui.radio_value(&mut *filling_type, FillingType::Phong, "Phong");
     }
 }
