@@ -1,4 +1,4 @@
-use super::{ChosenCamera, FillingType, GraphicDemo};
+use super::{ChosenCamera, FillingType, GraphicDemo, LightParameters};
 use crate::consts::*;
 use egui::*;
 impl eframe::App for GraphicDemo {
@@ -45,7 +45,9 @@ impl GraphicDemo {
             chosen_camera,
             filling_type,
             light_rotation,
+            light_parameters,
         } = self;
+        let LightParameters { m, kd, ks } = light_parameters;
         ui.label("Camera rotation degree");
         ui.add(egui::Slider::new(light_rotation, 0f32..=359f32).text("camera rotation angle"));
         ui.separator();
@@ -58,5 +60,10 @@ impl GraphicDemo {
         ui.radio_value(&mut *filling_type, FillingType::Constant, "Constant");
         ui.radio_value(&mut *filling_type, FillingType::Gouraud, "Gouraud");
         ui.radio_value(&mut *filling_type, FillingType::Phong, "Phong");
+        ui.separator();
+        ui.label("Light parameters");
+        ui.add(egui::Slider::new(m, 1f32..=MAX_M).text("m"));
+        ui.add(egui::Slider::new(kd, 0.001..=MAX_KD).text("kd"));
+        ui.add(egui::Slider::new(ks, 0.001..=MAX_KS).text("ks"));
     }
 }

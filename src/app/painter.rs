@@ -7,10 +7,10 @@ impl GraphicDemo {
             [(IMAGE_SIZE + 1) as usize, (IMAGE_SIZE + 1) as usize],
             Color32::TRANSPARENT,
         );
-        for x in 100..200 {
-            for y in 100..200 {
-                map[(x, y)] = Color32::RED;
-            }
+        for x in 0..IMAGE_SIZE {
+            [(x, 0), (0, x), (IMAGE_SIZE, x), (x, IMAGE_SIZE)]
+                .into_iter()
+                .for_each(|index| map[index] = Color32::WHITE);
         }
         map
     }
