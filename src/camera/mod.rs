@@ -21,6 +21,7 @@ impl Default for Camera {
         Self {
             position: STATIC_CAMERA_POSITION,
             target: STATIC_CAMERA_POSITION,
+            kind: CameraKind::Static,
             matrix: Matrix4::look_at_lh(
                 &Point3::new(
                     STATIC_CAMERA_POSITION[0] as f32,
@@ -34,7 +35,6 @@ impl Default for Camera {
                 ),
                 &Vector3::from_vec(UP_VECTOR.map(|a| a as f32).to_vec()),
             ),
-            kind: CameraKind::Static,
         }
     }
 }
@@ -44,7 +44,7 @@ impl Movable for Camera {
         match self.kind {
             CameraKind::Following => todo!(),
             CameraKind::Moving => todo!(),
-            CameraKind::Static => {},
+            CameraKind::Static => {}
         }
     }
 }

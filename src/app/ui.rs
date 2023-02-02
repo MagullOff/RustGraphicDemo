@@ -5,7 +5,7 @@ use egui::*;
 impl eframe::App for GraphicDemo {
     fn save(&mut self, _storage: &mut dyn eframe::Storage) {}
 
-    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             let bitmap = self.paint();
             let window_size = ui.available_size();

@@ -1,6 +1,6 @@
 use crate::vector::Vector3;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Polygon {
     pub vertices: Vec<Vertex>,
 }
@@ -22,11 +22,23 @@ impl Polygon {
         });
         sort_vec.iter().map(|elem| elem.0).collect()
     }
+
+    pub fn move_vertices(&mut self, vector: [i32; 3]) {
+        self.vertices
+            .iter_mut()
+            .for_each(|v| v.move_by_vector(vector));
+    }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Vertex {
     pub position: [i32; 3],
     pub normal: Vector3,
     pub color: Vector3,
+}
+
+impl Vertex {
+    fn move_by_vector(&mut self, vector: [i32; 3]) {
+        (0..=2).for_each(|i| self.position[i] += vector[i]);
+    }
 }
