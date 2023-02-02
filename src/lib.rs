@@ -10,6 +10,7 @@ pub mod consts {
 
 mod app;
 mod shape;
+mod traits;
 mod utils;
 pub use app::GraphicDemo;
 pub use shape::polygon;

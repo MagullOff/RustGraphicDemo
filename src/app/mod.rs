@@ -1,9 +1,12 @@
 use crate::consts::*;
+use crate::shape::{Shape, ShapeMovementType};
+use crate::utils::file_load::load_polygons;
 pub struct GraphicDemo {
     filling_type: FillingType,
     chosen_camera: ChosenCamera,
     light_rotation: f32,
     light_parameters: LightParameters,
+    shapes: Vec<Shape>,
     animation: bool,
 }
 
@@ -42,6 +45,11 @@ impl Default for GraphicDemo {
                 m: MAX_M / 2.0,
             },
             animation: true,
+            shapes: vec![Shape {
+                position: [0, 0, 0],
+                polygons: load_polygons("assets/sphere.obj"),
+                movement_type: ShapeMovementType::Static,
+            }],
         }
     }
 }
