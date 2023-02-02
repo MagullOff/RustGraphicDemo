@@ -1,3 +1,4 @@
+pub mod bresenham;
 pub mod edge;
 pub mod file_load;
 pub mod vector;
