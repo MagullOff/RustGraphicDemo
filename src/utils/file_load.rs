@@ -1,4 +1,4 @@
-use super::consts::*;
+use crate::consts::*;
 use crate::polygon::*;
 use crate::vector::Vector3;
 use native_dialog::FileDialog;
@@ -108,16 +108,4 @@ pub fn load_obj() -> Vec<Polygon> {
         }
         None => vec![],
     }
-}
-
-pub fn get_prev(i: usize, size: usize) -> usize {
-    if i > 0 {
-        i - 1
-    } else {
-        size - 1
-    }
-}
-
-pub fn get_next(i: usize, size: usize) -> usize {
-    (i + 1) % size
 }
