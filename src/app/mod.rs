@@ -1,13 +1,14 @@
+use crate::camera::Camera;
 use crate::consts::*;
-use crate::shape::{Shape, ShapeMovementType};
+use crate::shape::Shape;
 use crate::utils::file_load::load_polygons;
 pub struct GraphicDemo {
     filling_type: FillingType,
-    chosen_camera: ChosenCamera,
     light_rotation: f32,
     light_parameters: LightParameters,
     shapes: Vec<Shape>,
     animation: bool,
+    camera: Camera,
 }
 
 pub struct LightParameters {
@@ -36,7 +37,6 @@ pub mod ui;
 impl Default for GraphicDemo {
     fn default() -> Self {
         GraphicDemo {
-            chosen_camera: ChosenCamera::Static,
             filling_type: FillingType::Constant,
             light_rotation: 0.0,
             light_parameters: LightParameters {
@@ -50,6 +50,7 @@ impl Default for GraphicDemo {
                 polygons: load_polygons("assets/sphere.obj"),
                 ..Shape::default()
             }],
+            camera: Camera::default(),
         }
     }
 }

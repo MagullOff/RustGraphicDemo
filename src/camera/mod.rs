@@ -1,4 +1,5 @@
 use crate::consts::*;
+use crate::traits::movable::Movable;
 use nalgebra::{Matrix4, Point3, Vector3};
 
 #[derive(PartialEq, Eq)]
@@ -8,11 +9,11 @@ pub enum CameraKind {
     Moving,
 }
 
-struct Camera {
-    position: [i32; 3],
-    target: [i32; 3],
-    matrix: Matrix4<f32>,
-    kind: CameraKind,
+pub struct Camera {
+    pub position: [i32; 3],
+    pub target: [i32; 3],
+    pub matrix: Matrix4<f32>,
+    pub kind: CameraKind,
 }
 
 impl Default for Camera {
@@ -38,3 +39,12 @@ impl Default for Camera {
     }
 }
 
+impl Movable for Camera {
+    fn update(&mut self, tick: f32) {
+        match self.kind {
+            CameraKind::Following => todo!(),
+            CameraKind::Moving => todo!(),
+            CameraKind::Static => {},
+        }
+    }
+}

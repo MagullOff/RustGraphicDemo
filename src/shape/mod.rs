@@ -8,9 +8,9 @@ pub enum ShapeMovementType {
 }
 
 pub struct Shape {
-    polygons: Vec<Polygon>,
-    position: [i32; 3],
-    movement_type: ShapeMovementType,
+    pub polygons: Vec<Polygon>,
+    pub position: [i32; 3],
+    pub movement_type: ShapeMovementType,
 }
 
 impl Movable for Shape {

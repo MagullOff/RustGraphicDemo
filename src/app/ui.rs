@@ -1,4 +1,5 @@
-use super::{ChosenCamera, FillingType, GraphicDemo, LightParameters};
+use super::{FillingType, GraphicDemo, LightParameters};
+use crate::camera::CameraKind;
 use crate::consts::*;
 use egui::*;
 impl eframe::App for GraphicDemo {
@@ -42,20 +43,22 @@ impl GraphicDemo {
     }
     fn options_ui(&mut self, ui: &mut Ui) {
         let Self {
-            chosen_camera,
             filling_type,
             light_rotation,
             light_parameters,
             animation,
+            camera,
+            ..
         } = self;
         let LightParameters { m, kd, ks } = light_parameters;
+        ui.checkbox(&mut *animation, "Enable animation");
         ui.label("Camera rotation degree");
         ui.add(egui::Slider::new(light_rotation, 0f32..=359f32).text("camera rotation angle"));
         ui.separator();
         ui.label("Chose the camera");
-        ui.radio_value(&mut *chosen_camera, ChosenCamera::Static, "Static");
-        ui.radio_value(&mut *chosen_camera, ChosenCamera::Moving, "Moving");
-        ui.radio_value(&mut *chosen_camera, ChosenCamera::Following, "Following");
+        ui.radio_value(&mut camera.kind, CameraKind::Static, "Static");
+        ui.radio_value(&mut camera.kind, CameraKind::Moving, "Moving");
+        ui.radio_value(&mut camera.kind, CameraKind::Following, "Following");
         ui.separator();
         ui.label("Chose the filling type");
         ui.radio_value(&mut *filling_type, FillingType::Constant, "Constant");
