@@ -48,7 +48,7 @@ impl Default for GraphicDemo {
             shapes: vec![Shape {
                 position: [0, 0, 0],
                 polygons: load_polygons("assets/sphere.obj"),
-                movement_type: ShapeMovementType::Static,
+                ..Shape::default()
             }],
         }
     }
