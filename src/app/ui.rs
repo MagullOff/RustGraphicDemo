@@ -46,6 +46,7 @@ impl GraphicDemo {
             filling_type,
             light_rotation,
             light_parameters,
+            animation,
         } = self;
         let LightParameters { m, kd, ks } = light_parameters;
         ui.label("Camera rotation degree");

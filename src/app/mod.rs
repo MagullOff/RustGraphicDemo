@@ -4,6 +4,7 @@ pub struct GraphicDemo {
     chosen_camera: ChosenCamera,
     light_rotation: f32,
     light_parameters: LightParameters,
+    animation: bool,
 }
 
 pub struct LightParameters {
@@ -40,6 +41,7 @@ impl Default for GraphicDemo {
                 ks: MAX_KS / 2.0,
                 m: MAX_M / 2.0,
             },
+            animation: true,
         }
     }
 }
