@@ -18,13 +18,6 @@ pub struct LightParameters {
 }
 
 #[derive(PartialEq, Eq)]
-pub enum ChosenCamera {
-    Static,
-    Following,
-    Moving,
-}
-
-#[derive(PartialEq, Eq)]
 pub enum FillingType {
     Constant,
     Gouraud,
@@ -38,18 +31,30 @@ impl Default for GraphicDemo {
     fn default() -> Self {
         GraphicDemo {
             filling_type: FillingType::Constant,
-            light_rotation: 0.0,
+            light_rotation: 90.0,
             light_parameters: LightParameters {
                 kd: MAX_KD / 2.0,
                 ks: MAX_KS / 2.0,
                 m: MAX_M / 2.0,
             },
             animation: true,
-            shapes: vec![Shape::new(
-                load_polygons("assets/sphere.obj"),
-                [5, 0, 0],
-                ShapeMovementType::Static,
-            )],
+            shapes: vec![
+                Shape::new(
+                    load_polygons("assets/cube.obj"),
+                    [0, -150, 0],
+                    ShapeMovementType::Static,
+                ),
+                Shape::new(
+                    load_polygons("assets/cube.obj"),
+                    [0, 150, 0],
+                    ShapeMovementType::Static,
+                ),
+                Shape::new(
+                    load_polygons("assets/cube.obj"),
+                    [0, 0, 0],
+                    ShapeMovementType::Orbital,
+                ),
+            ],
             camera: Camera::default(),
         }
     }

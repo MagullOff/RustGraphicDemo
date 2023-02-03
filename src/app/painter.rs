@@ -46,30 +46,12 @@ impl GraphicDemo {
             1.0,
         );
         let a = 1.0;
-        let fov_deg = 120.0;
-        let n = 1.0;
+        let fov_deg = self.light_rotation;
+        let n = 0.5;
         let f = 100.0;
         let fov = (fov_deg / 180.0) * std::f32::consts::PI;
-        let e = 1.0 / (fov as f32 / 2.0).tan();
 
-        let m: Matrix4<f32> = Matrix4::new(
-            e,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            e / a,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            -(f + n) / (f - n),
-            -(2.0 * f * n) / (f - n),
-            0.0,
-            0.0,
-            -1.0,
-            0.0,
-        );
+        let m = Matrix4::new_perspective(a, fov, n, f);
 
         let xy = m * (view_mat * (model_mat2 * p1));
         let x1 = (((xy[0] + 1.0) / 2.0) * IMAGE_SIZE as f32) as usize;
@@ -100,35 +82,19 @@ impl GraphicDemo {
             Color32::TRANSPARENT,
         );
 
-        let model_mat2 = Matrix4::new(
-            1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            (0.0 as f32).cos(),
-            (0.0 as f32).sin(),
-            0.0,
-            0.0,
-            (0.0 as f32).sin(),
-            (0.0 as f32).cos(),
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            1.0,
-        );
         // let mut zbuffor: Vec<Vec<f32>> =
         //     vec![vec![std::f32::MAX; IMAGE_SIZE as usize + 1]; IMAGE_SIZE as usize + 1];
 
-        for i in 0..self.shapes[0].transformed_polygons.len() {
-            self.draw_lines(
-                self.camera.matrix,
-                model_mat2,
-                &self.shapes[0].transformed_polygons[i],
-                &mut map,
-                Color32::LIGHT_GRAY,
-            );
+        for shape in &self.shapes {
+            for polygon in &shape.transformed_polygons {
+                self.draw_lines(
+                    self.camera.matrix,
+                    shape.matrix,
+                    polygon,
+                    &mut map,
+                    Color32::LIGHT_GRAY,
+                );
+            }
         }
 
         for x in 0..IMAGE_SIZE {

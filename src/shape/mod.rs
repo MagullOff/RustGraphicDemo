@@ -1,5 +1,6 @@
 pub mod polygon;
-use polygon::{Polygon, Vertex};
+use nalgebra::{Matrix4, Point3, Vector3};
+use polygon::Polygon;
 
 use crate::traits::movable::Movable;
 
@@ -15,6 +16,7 @@ pub struct Shape {
     polygons: Vec<Polygon>,
     pub position: [i32; 3],
     pub movement_type: ShapeMovementType,
+    pub matrix: Matrix4<f32>,
 }
 
 impl Movable for Shape {
@@ -22,7 +24,16 @@ impl Movable for Shape {
         match self.movement_type {
             ShapeMovementType::Static => {}
             ShapeMovementType::Orbital => {
-                todo!()
+                let angle = (tick * 2.5).rem_euclid(2.0 * std::f32::consts::PI) as f32;
+                let r = 500.0;
+                self.position[0] = (r * angle.sin()) as i32;
+                self.position[1] = (r * angle.cos()) as i32;
+                let mut new_polygons = self.polygons.clone();
+                new_polygons
+                    .iter_mut()
+                    .for_each(|p| p.move_vertices(self.position));
+                self.transformed_polygons = new_polygons;
+                // self.matrix = Matrix4::new_rotation(Vector3::from_vec(vec![0.0, 0.0, angle]))
             }
         }
     }
@@ -44,6 +55,7 @@ impl Shape {
             polygons,
             position,
             movement_type,
+            matrix: Matrix4::new_rotation(Vector3::zeros()),
         }
     }
 }

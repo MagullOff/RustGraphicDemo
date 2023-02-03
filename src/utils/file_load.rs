@@ -53,6 +53,7 @@ pub fn load_min_cords(object: &Obj) -> MinCords {
     }
     min_cords
 }
+
 pub fn map_point(min_cords: MinCords, cords: [f32; 3]) -> [i32; 3] {
     let x_range = min_cords.max_x - min_cords.min_x;
     let y_range = min_cords.max_y - min_cords.min_y;
@@ -63,6 +64,7 @@ pub fn map_point(min_cords: MinCords, cords: [f32; 3]) -> [i32; 3] {
     let z = (cords[2] - min_cords.min_z) / z_range * (SHAPE_SIZE as f32) - (SHAPE_SIZE / 2) as f32;
     [x as i32, y as i32, z as i32]
 }
+
 pub fn load_polygons(file_path: &str) -> Vec<Polygon> {
     match Obj::from_file(&file_path) {
         Ok(o) => {
@@ -75,13 +77,7 @@ pub fn load_polygons(file_path: &str) -> Vec<Polygon> {
                             let positions = map_point(min_cords, v.position());
                             Vertex {
                                 position: positions,
-                                normal: v.normal().map(Vector3::from_array).unwrap_or_else(|| {
-                                    Vector3::new(
-                                        (positions[0] - IMAGE_SIZE as i32 / 2) as f32,
-                                        (positions[1] - IMAGE_SIZE as i32 / 2) as f32,
-                                        positions[2] as f32,
-                                    )
-                                }),
+                                normal: v.normal().map(Vector3::from_array).unwrap(),
                                 color: Vector3::default(),
                             }
                         })

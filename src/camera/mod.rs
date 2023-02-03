@@ -22,7 +22,7 @@ impl Default for Camera {
             position: STATIC_CAMERA_POSITION,
             target: STATIC_CAMERA_POSITION,
             kind: CameraKind::Static,
-            matrix: Matrix4::look_at_lh(
+            matrix: Matrix4::face_towards(
                 &Point3::new(
                     STATIC_CAMERA_POSITION[0] as f32,
                     STATIC_CAMERA_POSITION[1] as f32,
