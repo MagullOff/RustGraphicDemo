@@ -26,6 +26,7 @@ pub mod consts {
 
 mod app;
 mod camera;
+mod light;
 mod shape;
 mod traits;
 mod utils;
