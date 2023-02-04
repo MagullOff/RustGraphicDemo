@@ -60,11 +60,9 @@ impl GraphicDemo {
     ) {
         let a = 1.0;
         let fov_deg = self.fov;
-        let n = 1.0;
-        let f = 3000.0;
         let fov = (fov_deg / 180.0) * std::f32::consts::PI;
 
-        let perspective_matrix = Matrix4::new_perspective(a, fov, n, f);
+        let perspective_matrix = Matrix4::new_perspective(a, fov, CAMERA_NEAR, CAMERA_FAR);
         polygon
             .vertices
             .iter()

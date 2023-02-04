@@ -2,7 +2,7 @@ pub mod polygon;
 use nalgebra::{Matrix4, Point3, Vector3};
 use polygon::Polygon;
 
-use crate::traits::movable::Movable;
+use crate::{consts::SHAPE_ORBIT_RADIUS, traits::movable::Movable};
 
 #[derive(Debug)]
 pub enum ShapeMovementType {
@@ -25,15 +25,21 @@ impl Movable for Shape {
             ShapeMovementType::Static => {}
             ShapeMovementType::Orbital => {
                 let angle = (tick * 2.5).rem_euclid(2.0 * std::f32::consts::PI) as f32;
-                let r = 500.0;
-                self.position[0] = (r * angle.sin()) as i32;
-                self.position[1] = (r * angle.cos()) as i32;
+                self.position[0] = (SHAPE_ORBIT_RADIUS * angle.sin()) as i32;
+                self.position[1] = (SHAPE_ORBIT_RADIUS * angle.cos()) as i32;
                 let mut new_polygons = self.polygons.clone();
                 new_polygons
                     .iter_mut()
                     .for_each(|p| p.move_vertices(self.position));
                 self.transformed_polygons = new_polygons;
-                // self.matrix = Matrix4::new_rotation(Vector3::from_vec(vec![0.0, 0.0, angle]))
+                self.matrix = Matrix4::new_rotation_wrt_point(
+                    Vector3::from_vec(vec![0.0, 0.0, angle]),
+                    Point3::new(
+                        self.position[0] as f32,
+                        self.position[1] as f32,
+                        self.position[2] as f32,
+                    ),
+                )
             }
         }
     }
