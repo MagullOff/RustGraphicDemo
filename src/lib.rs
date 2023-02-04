@@ -27,10 +27,11 @@ pub mod consts {
 
 mod app;
 mod camera;
+mod filler;
 mod light;
 mod shape;
 mod traits;
 mod utils;
 pub use app::GraphicDemo;
 pub use shape::polygon;
-pub use utils::{edge, file_load};
+pub use utils::file_load;

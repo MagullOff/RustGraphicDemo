@@ -2,6 +2,7 @@ use crate::camera::Camera;
 use crate::consts::*;
 use crate::shape::{Shape, ShapeMovementType};
 use crate::utils::file_load::load_polygons;
+use egui::Color32;
 use nalgebra::Point3;
 pub struct GraphicDemo {
     filling_type: FillingType,
@@ -44,16 +45,19 @@ impl Default for GraphicDemo {
                     load_polygons("assets/cube.obj"),
                     Point3::new(0.0, -150.0, 0.0),
                     ShapeMovementType::Static,
+                    Color32::GRAY,
                 ),
                 Shape::new(
                     load_polygons("assets/cube.obj"),
                     Point3::new(0.0, 150.0, 0.0),
                     ShapeMovementType::Static,
+                    Color32::BLUE,
                 ),
                 Shape::new(
                     load_polygons("assets/cube.obj"),
                     Point3::new(0.0, -150.0, 0.0),
                     ShapeMovementType::Orbital,
+                    Color32::RED,
                 ),
             ],
             camera: Camera::default(),

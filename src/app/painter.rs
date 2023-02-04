@@ -1,11 +1,11 @@
 use super::GraphicDemo;
-use crate::consts::*;
 use crate::polygon::Polygon;
 use crate::utils::bresenham::draw_bresenham_line;
+use crate::{consts::*, polygon::Vertex};
 use egui::*;
 use itertools::Itertools;
-use nalgebra::{Matrix4, Point3, Vector4};
-type Cords = (f32, f32);
+use nalgebra::{Matrix4, Point3, Vector3, Vector4};
+type Cords = (f32, f32, f32);
 
 pub fn is_in_range(p: Vector4<f32>) -> bool {
     (0..=2)
@@ -27,8 +27,8 @@ fn calculate_clip_cords(
 }
 
 fn draw_if_in_range(
-    point1: (Cords, Vector4<f32>),
-    point2: (Cords, Vector4<f32>),
+    point1: (Point3<f32>, Vector4<f32>),
+    point2: (Point3<f32>, Vector4<f32>),
     map: &mut ColorImage,
     color: Color32,
 ) {
@@ -36,10 +36,11 @@ fn draw_if_in_range(
         draw_bresenham_line(map, point1.0, point2.0, color);
     }
 }
-fn calculate_normalized_cords(p: Vector4<f32>) -> (f32, f32) {
-    (
+fn calculate_normalized_cords(p: Vector4<f32>) -> Point3<f32> {
+    Point3::new(
         (p[0] / p[3] + 1.0) / 2.0 * IMAGE_SIZE as f32,
         (p[1] / p[3] + 1.0) / 2.0 * IMAGE_SIZE as f32,
+        (p[2] / p[3] + 1.0) / 2.0 * IMAGE_SIZE as f32,
     )
 }
 
@@ -50,6 +51,7 @@ impl GraphicDemo {
         rotation_matrix: Matrix4<f32>,
         polygon: &Polygon,
         map: &mut ColorImage,
+        zbuffor: &mut Vec<Vec<f32>>,
         color: Color32,
     ) {
         let a = 1.0;
@@ -57,14 +59,27 @@ impl GraphicDemo {
         let fov = (fov_deg / 180.0) * std::f32::consts::PI;
 
         let perspective_matrix = Matrix4::new_perspective(a, fov, CAMERA_NEAR, CAMERA_FAR);
-        polygon
+        let normalized_vertices = polygon
             .vertices
             .iter()
             .map(|v| calculate_point_vector(v.position))
             .map(|p| calculate_clip_cords(perspective_matrix, view_matrix, rotation_matrix, p))
-            .map(|clip_cords| (calculate_normalized_cords(clip_cords), clip_cords))
+            .map(|clip_cords| (calculate_normalized_cords(clip_cords), clip_cords));
+
+        let sus_polygon = Polygon {
+            vertices: normalized_vertices
+                .clone()
+                .map(|(point, _)| Vertex {
+                    position: point,
+                    normal: Vector3::new(0.0, 0.0, 0.0),
+                    color: Vector3::new(0.0, 0.0, 0.0),
+                })
+                .collect(),
+        };
+        self.fill_polygon(&sus_polygon, map, zbuffor, color);
+        normalized_vertices
             .combinations(2)
-            .for_each(|pair| draw_if_in_range(pair[0], pair[1], map, color));
+            .for_each(|pair| draw_if_in_range(pair[0], pair[1], map, Color32::WHITE));
     }
 
     pub fn paint(&mut self) -> egui::ColorImage {
@@ -73,8 +88,8 @@ impl GraphicDemo {
             Color32::TRANSPARENT,
         );
 
-        // let mut zbuffor: Vec<Vec<f32>> =
-        //     vec![vec![std::f32::MAX; IMAGE_SIZE as usize + 1]; IMAGE_SIZE as usize + 1];
+        let mut zbuffor: Vec<Vec<f32>> =
+            vec![vec![std::f32::MAX; IMAGE_SIZE as usize + 1]; IMAGE_SIZE as usize + 1];
 
         for shape in &self.shapes {
             for polygon in &shape.transformed_polygons {
@@ -83,7 +98,8 @@ impl GraphicDemo {
                     shape.matrix,
                     polygon,
                     &mut map,
-                    Color32::LIGHT_GRAY,
+                    &mut zbuffor,
+                    shape.color,
                 );
             }
         }

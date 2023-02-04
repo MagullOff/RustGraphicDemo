@@ -1,4 +1,5 @@
 pub mod polygon;
+use egui::Color32;
 use nalgebra::{Matrix4, Point3, Vector3};
 use polygon::Polygon;
 
@@ -17,6 +18,7 @@ pub struct Shape {
     pub position: Point3<f32>,
     pub movement_type: ShapeMovementType,
     pub matrix: Matrix4<f32>,
+    pub color: Color32,
 }
 
 impl Movable for Shape {
@@ -50,6 +52,7 @@ impl Shape {
         polygons: Vec<Polygon>,
         position: Point3<f32>,
         movement_type: ShapeMovementType,
+        color: Color32,
     ) -> Self {
         let mut new_polygons = polygons.clone();
         new_polygons
@@ -62,6 +65,7 @@ impl Shape {
             position,
             movement_type,
             matrix: Matrix4::new_rotation(Vector3::zeros()),
+            color,
         }
     }
 }

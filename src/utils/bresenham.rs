@@ -1,10 +1,11 @@
 use egui::{Color32, ColorImage};
+use nalgebra::Point3;
 
-pub fn draw_bresenham_line(map: &mut ColorImage, x: (f32, f32), y: (f32, f32), color: Color32) {
-    let mut x0: f32 = x.0.floor();
-    let mut x1: f32 = y.0.floor();
-    let mut y0: f32 = x.1.floor();
-    let mut y1: f32 = y.1.floor();
+pub fn draw_bresenham_line(map: &mut ColorImage, x: Point3<f32>, y: Point3<f32>, color: Color32) {
+    let mut x0: f32 = x.x.floor();
+    let mut x1: f32 = y.x.floor();
+    let mut y0: f32 = x.y.floor();
+    let mut y1: f32 = y.y.floor();
 
     let steep = (x0 - x1).abs() < (y0 - y1).abs();
 

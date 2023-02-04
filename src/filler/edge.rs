@@ -1,3 +1,4 @@
+use nalgebra::Point3;
 use rand::prelude::*;
 #[derive(Debug)]
 pub struct Edge {
