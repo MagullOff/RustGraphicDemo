@@ -17,6 +17,7 @@ impl eframe::App for GraphicDemo {
                 for shape in &mut self.shapes {
                     shape.update(sec_since_midnight as f32);
                 }
+                self.camera.update(sec_since_midnight as f32);
                 ui.ctx().request_repaint();
             }
             let bitmap = self.paint();
@@ -51,16 +52,6 @@ impl eframe::App for GraphicDemo {
 
 impl GraphicDemo {
     pub fn new(_cc: &eframe::CreationContext<'_>) -> Self {
-        use crate::shape::*;
-        use crate::utils::file_load::load_polygons;
-        println!(
-            "{:?}",
-            Shape::new(
-                load_polygons("assets/cube.obj"),
-                [0, 0, 0],
-                ShapeMovementType::Orbital,
-            ),
-        );
         Default::default()
     }
     fn options_ui(&mut self, ui: &mut Ui) {
@@ -92,9 +83,13 @@ impl GraphicDemo {
         ui.add(egui::Slider::new(kd, 0.001..=MAX_KD).text("kd"));
         ui.add(egui::Slider::new(ks, 0.001..=MAX_KS).text("ks"));
         ui.label("Light parameters");
-        ui.add(egui::Slider::new(&mut self.camera.position[0], -10..=10).text("x"));
-        ui.add(egui::Slider::new(&mut self.camera.position[1], -10..=10).text("y"));
-        ui.add(egui::Slider::new(&mut self.camera.position[2], -100..=100).text("z"));
+        ui.add(egui::Slider::new(&mut self.camera.position[0], -1000.0..=1000.0).text("x"));
+        ui.add(egui::Slider::new(&mut self.camera.position[1], -1000.0..=1000.0).text("y"));
+        ui.add(egui::Slider::new(&mut self.camera.position[2], -1000.0..=1000.0).text("z"));
+        ui.label("Light parameters");
+        ui.add(egui::Slider::new(&mut self.camera.target[0], -500.0..=500.0).text("x"));
+        ui.add(egui::Slider::new(&mut self.camera.target[1], -500.0..=500.0).text("y"));
+        ui.add(egui::Slider::new(&mut self.camera.target[2], -10.0..=10.0).text("z"));
         self.camera.matrix = Matrix4::look_at_rh(
             &Point3::new(
                 self.camera.position[0] as f32,
@@ -102,11 +97,12 @@ impl GraphicDemo {
                 self.camera.position[2] as f32,
             ),
             &Point3::new(
-                STATIC_CAMERA_TARGET[0] as f32,
-                STATIC_CAMERA_TARGET[1] as f32,
-                STATIC_CAMERA_TARGET[2] as f32,
+                self.camera.target[0] as f32,
+                self.camera.target[1] as f32,
+                self.camera.target[2] as f32,
             ),
             &Vector3::from_vec(UP_VECTOR.map(|a| a as f32).to_vec()),
-        )
+        );
+        println!("{:?}", self.camera);
     }
 }

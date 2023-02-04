@@ -17,6 +17,7 @@ image = { version = "0.24", features = ["jpeg", "png"] }
 chrono = "0.4.23"
 tracing-subscriber = "0.3"
 nalgebra = "0.31.4"
+itertools = "0.10.5"
 
 [profile.release]
 opt-level = 2 

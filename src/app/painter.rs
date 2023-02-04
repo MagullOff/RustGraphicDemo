@@ -2,78 +2,77 @@ use super::GraphicDemo;
 use crate::consts::*;
 use crate::polygon::Polygon;
 use crate::utils::bresenham::draw_bresenham_line;
+use itertools::Itertools;
 use nalgebra::{Matrix4, Vector4};
 // use crate::utils::bresenham::draw_bresenham_line;
 use egui::*;
-pub fn is_in_range(p: (usize, usize)) -> bool {
-    p.0 > 0 && p.1 > 0 && p.0 < IMAGE_SIZE as usize && p.1 < IMAGE_SIZE as usize
+type Cords = (f32, f32);
+
+pub fn is_in_range(p: Vector4<f32>) -> bool {
+    (0..=2)
+        .map(|i| p[i] > -p[3] && p[i] < p[3])
+        .all(|cond| cond)
+}
+
+fn calculate_point_vector(position: [i32; 3]) -> Vector4<f32> {
+    Vector4::new(
+        (position[0] - (IMAGE_SIZE as i32 / 2)) as f32 / (IMAGE_SIZE / 2) as f32,
+        (position[1] - (IMAGE_SIZE as i32 / 2)) as f32 / (IMAGE_SIZE / 2) as f32,
+        (position[2] - (IMAGE_SIZE as i32 / 2)) as f32 / (IMAGE_SIZE / 2) as f32,
+        1.0,
+    )
+}
+
+fn calculate_clip_cords(
+    perspective_matrix: Matrix4<f32>,
+    view_matrixrix: Matrix4<f32>,
+    rotation_matrix: Matrix4<f32>,
+    p: Vector4<f32>,
+) -> Vector4<f32> {
+    perspective_matrix * (view_matrixrix * (rotation_matrix * p))
+}
+
+fn draw_if_in_range(
+    point1: (Cords, Vector4<f32>),
+    point2: (Cords, Vector4<f32>),
+    map: &mut ColorImage,
+    color: Color32,
+) {
+    if is_in_range(point1.1) && is_in_range(point2.1) {
+        draw_bresenham_line(map, point1.0, point2.0, color);
+    }
+}
+fn calculate_normalized_cords(p: Vector4<f32>) -> (f32, f32) {
+    (
+        (p[0] / p[3] + 1.0) / 2.0 * IMAGE_SIZE as f32,
+        (p[1] / p[3] + 1.0) / 2.0 * IMAGE_SIZE as f32,
+    )
 }
 
 impl GraphicDemo {
     fn draw_lines(
         &self,
-        view_mat: Matrix4<f32>,
-        model_mat2: Matrix4<f32>,
+        view_matrix: Matrix4<f32>,
+        rotation_matrix: Matrix4<f32>,
         polygon: &Polygon,
         map: &mut ColorImage,
         color: Color32,
     ) {
-        let p1: Vector4<f32> = Vector4::new(
-            (polygon.vertices[0].position[0] - (IMAGE_SIZE as i32 / 2)) as f32
-                / (IMAGE_SIZE / 2) as f32,
-            (polygon.vertices[0].position[1] - (IMAGE_SIZE as i32 / 2)) as f32
-                / (IMAGE_SIZE / 2) as f32,
-            (polygon.vertices[0].position[2] - (IMAGE_SIZE as i32 / 2)) as f32
-                / (IMAGE_SIZE / 2) as f32,
-            1.0,
-        );
-        let p2: Vector4<f32> = Vector4::new(
-            (polygon.vertices[1].position[0] - (IMAGE_SIZE as i32 / 2)) as f32
-                / (IMAGE_SIZE / 2) as f32,
-            (polygon.vertices[1].position[1] - (IMAGE_SIZE as i32 / 2)) as f32
-                / (IMAGE_SIZE / 2) as f32,
-            (polygon.vertices[1].position[2] - (IMAGE_SIZE as i32 / 2)) as f32
-                / (IMAGE_SIZE / 2) as f32,
-            1.0,
-        );
-        let p3: Vector4<f32> = Vector4::new(
-            (polygon.vertices[2].position[0] - (IMAGE_SIZE as i32 / 2)) as f32
-                / (IMAGE_SIZE / 2) as f32,
-            (polygon.vertices[2].position[1] - (IMAGE_SIZE as i32 / 2)) as f32
-                / (IMAGE_SIZE / 2) as f32,
-            (polygon.vertices[2].position[2] - (IMAGE_SIZE as i32 / 2)) as f32
-                / (IMAGE_SIZE / 2) as f32,
-            1.0,
-        );
         let a = 1.0;
         let fov_deg = self.light_rotation;
         let n = 0.5;
         let f = 100.0;
         let fov = (fov_deg / 180.0) * std::f32::consts::PI;
 
-        let m = Matrix4::new_perspective(a, fov, n, f);
-
-        let xy = m * (view_mat * (model_mat2 * p1));
-        let x1 = (((xy[0] + 1.0) / 2.0) * IMAGE_SIZE as f32) as usize;
-        let y1 = (((xy[1] + 1.0) / 2.0) * IMAGE_SIZE as f32) as usize;
-        let z1 = (((xy[2] + 1.0) / 2.0) * IMAGE_SIZE as f32) as usize;
-        let xy = m * (view_mat * (model_mat2 * p2));
-        let x2 = (((xy[0] + 1.0) / 2.0) * IMAGE_SIZE as f32) as usize;
-        let y2 = (((xy[1] + 1.0) / 2.0) * IMAGE_SIZE as f32) as usize;
-        let z2 = (((xy[2] + 1.0) / 2.0) * IMAGE_SIZE as f32) as usize;
-        let xy = m * (view_mat * (model_mat2 * p3));
-        let x3 = (((xy[0] + 1.0) / 2.0) * IMAGE_SIZE as f32) as usize;
-        let y3 = (((xy[1] + 1.0) / 2.0) * IMAGE_SIZE as f32) as usize;
-        let z3 = (((xy[2] + 1.0) / 2.0) * IMAGE_SIZE as f32) as usize;
-        if is_in_range((x1, y1)) && is_in_range((x2, y2)) {
-            draw_bresenham_line(map, (x1 as f32, y1 as f32), (x2 as f32, y2 as f32), color);
-        }
-        if is_in_range((x3, y3)) && is_in_range((x2, y2)) {
-            draw_bresenham_line(map, (x2 as f32, y2 as f32), (x3 as f32, y3 as f32), color);
-        }
-        if is_in_range((x1, y1)) && is_in_range((x2, y2)) {
-            draw_bresenham_line(map, (x1 as f32, y1 as f32), (x2 as f32, y2 as f32), color);
-        }
+        let perspective_matrix = Matrix4::new_perspective(a, fov, n, f);
+        polygon
+            .vertices
+            .iter()
+            .map(|v| calculate_point_vector(v.position))
+            .map(|p| calculate_clip_cords(perspective_matrix, view_matrix, rotation_matrix, p))
+            .map(|clip_cords| (calculate_normalized_cords(clip_cords), clip_cords))
+            .combinations(2)
+            .for_each(|pair| draw_if_in_range(pair[0], pair[1], map, color));
     }
 
     pub fn paint(&mut self) -> egui::ColorImage {
