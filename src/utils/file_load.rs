@@ -1,6 +1,6 @@
 use crate::consts::*;
 use crate::polygon::*;
-use crate::vector::Vector3;
+use nalgebra::{Point3, Vector3};
 use native_dialog::FileDialog;
 use wavefront::Obj;
 
@@ -54,7 +54,7 @@ pub fn load_min_cords(object: &Obj) -> MinCords {
     min_cords
 }
 
-pub fn map_point(min_cords: MinCords, cords: [f32; 3]) -> [i32; 3] {
+pub fn map_point(min_cords: MinCords, cords: [f32; 3]) -> Point3<f32> {
     let x_range = min_cords.max_x - min_cords.min_x;
     let y_range = min_cords.max_y - min_cords.min_y;
     let z_range = min_cords.max_z - min_cords.min_z;
@@ -62,7 +62,7 @@ pub fn map_point(min_cords: MinCords, cords: [f32; 3]) -> [i32; 3] {
     let x = (cords[0] - min_cords.min_x) / x_range * (SHAPE_SIZE as f32) - (SHAPE_SIZE / 2) as f32;
     let y = (cords[1] - min_cords.min_y) / y_range * (SHAPE_SIZE as f32) - (SHAPE_SIZE / 2) as f32;
     let z = (cords[2] - min_cords.min_z) / z_range * (SHAPE_SIZE as f32) - (SHAPE_SIZE / 2) as f32;
-    [x as i32, y as i32, z as i32]
+    Point3::new(x, y, z)
 }
 
 pub fn load_polygons(file_path: &str) -> Vec<Polygon> {
@@ -77,7 +77,7 @@ pub fn load_polygons(file_path: &str) -> Vec<Polygon> {
                             let positions = map_point(min_cords, v.position());
                             Vertex {
                                 position: positions,
-                                normal: v.normal().map(Vector3::from_array).unwrap(),
+                                normal: v.normal().map(|[x, y, z]| Vector3::new(x, y, z)).unwrap(),
                                 color: Vector3::default(),
                             }
                         })

@@ -1,7 +1,6 @@
 pub mod bresenham;
 pub mod edge;
 pub mod file_load;
-pub mod vector;
 
 pub fn get_prev(i: usize, size: usize) -> usize {
     if i > 0 {

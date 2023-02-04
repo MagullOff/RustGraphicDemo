@@ -1,6 +1,7 @@
 #![warn(clippy::all, rust_2018_idioms)]
 
 pub mod consts {
+    use nalgebra::{Point3, Vector3};
     pub const IMAGE_SIZE: usize = 900;
     pub const SHAPE_SIZE: u32 = 200;
     pub const MAX_KD: f32 = 1.0;
@@ -10,15 +11,15 @@ pub mod consts {
     pub const SHAPE_ORBIT_RADIUS: f32 = 800.0;
     pub const CAMERA_ORBIT_RADIUS: f32 = 400.0 + SHAPE_ORBIT_RADIUS;
 
-    pub const FOLLOWING_CAMERA_POSITION: [f32; 3] = [-900.0, 900.0, -1000.0];
+    pub const FOLLOWING_CAMERA_POSITION: Point3<f32> = Point3::new(-900.0, 900.0, -1000.0);
 
-    pub const MOVING_CAMERA_TARGET: [f32; 3] = [0.0, 0.0, 0.0];
+    pub const MOVING_CAMERA_TARGET: Point3<f32> = Point3::new(0.0, 0.0, 0.0);
     pub const MOVING_CAMERA_Z: f32 = -500.0;
 
-    pub const STATIC_CAMERA_POSITION: [f32; 3] = [900.0, 900.0, -500.0];
-    pub const STATIC_CAMERA_TARGET: [f32; 3] = [0.0, 0.0, 0.0];
+    pub const STATIC_CAMERA_POSITION: Point3<f32> = Point3::new(900.0, 900.0, -500.0);
+    pub const STATIC_CAMERA_TARGET: Point3<f32> = Point3::new(0.0, 0.0, 0.0);
 
-    pub const UP_VECTOR: [i32; 3] = [0, 0, 1];
+    pub const UP_VECTOR: Vector3<f32> = Vector3::new(0.0, 0.0, 1.0);
 
     pub const CAMERA_NEAR: f32 = 1.0;
     pub const CAMERA_FAR: f32 = 4000.0;
@@ -32,4 +33,4 @@ mod traits;
 mod utils;
 pub use app::GraphicDemo;
 pub use shape::polygon;
-pub use utils::{edge, file_load, vector};
+pub use utils::{edge, file_load};

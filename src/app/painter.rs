@@ -2,10 +2,9 @@ use super::GraphicDemo;
 use crate::consts::*;
 use crate::polygon::Polygon;
 use crate::utils::bresenham::draw_bresenham_line;
-use itertools::Itertools;
-use nalgebra::{Matrix4, Vector4};
-// use crate::utils::bresenham::draw_bresenham_line;
 use egui::*;
+use itertools::Itertools;
+use nalgebra::{Matrix4, Point3, Vector4};
 type Cords = (f32, f32);
 
 pub fn is_in_range(p: Vector4<f32>) -> bool {
@@ -14,13 +13,8 @@ pub fn is_in_range(p: Vector4<f32>) -> bool {
         .all(|cond| cond)
 }
 
-fn calculate_point_vector(position: [i32; 3]) -> Vector4<f32> {
-    Vector4::new(
-        position[0] as f32,
-        position[1] as f32,
-        position[2] as f32,
-        1.0,
-    )
+fn calculate_point_vector(position: Point3<f32>) -> Vector4<f32> {
+    Vector4::new(position.x, position.y, position.z, 1.0)
 }
 
 fn calculate_clip_cords(

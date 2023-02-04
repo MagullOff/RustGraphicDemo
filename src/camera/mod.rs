@@ -1,6 +1,6 @@
 use crate::consts::*;
 use crate::traits::movable::Movable;
-use nalgebra::{Matrix4, Point3, Vector3};
+use nalgebra::{Matrix4, Point3};
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum CameraKind {
@@ -11,27 +11,15 @@ pub enum CameraKind {
 
 #[derive(Debug)]
 pub struct Camera {
-    pub position: [f32; 3],
-    pub target: [f32; 3],
+    pub position: Point3<f32>,
+    pub target: Point3<f32>,
     pub matrix: Matrix4<f32>,
     pub kind: CameraKind,
 }
 
 impl Camera {
     fn calculate_matrix(&mut self) {
-        self.matrix = Matrix4::look_at_rh(
-            &Point3::new(
-                self.position[0] as f32,
-                self.position[1] as f32,
-                self.position[2] as f32,
-            ),
-            &Point3::new(
-                self.target[0] as f32,
-                self.target[1] as f32,
-                self.target[2] as f32,
-            ),
-            &Vector3::from_vec(UP_VECTOR.map(|a| a as f32).to_vec()),
-        );
+        self.matrix = Matrix4::look_at_rh(&self.position, &self.target, &UP_VECTOR);
     }
 }
 
@@ -52,7 +40,7 @@ impl Default for Camera {
                     STATIC_CAMERA_TARGET[1] as f32,
                     STATIC_CAMERA_TARGET[2] as f32,
                 ),
-                &Vector3::from_vec(UP_VECTOR.map(|a| a as f32).to_vec()),
+                &UP_VECTOR,
             ),
         }
     }
@@ -63,16 +51,16 @@ impl Movable for Camera {
         let angle = (tick * 2.5).rem_euclid(2.0 * std::f32::consts::PI) as f32;
         match self.kind {
             CameraKind::Following => {
-                self.target[0] = SHAPE_ORBIT_RADIUS * angle.sin();
-                self.target[1] = SHAPE_ORBIT_RADIUS * angle.cos();
+                self.target.x = SHAPE_ORBIT_RADIUS * angle.sin();
+                self.target.y = SHAPE_ORBIT_RADIUS * angle.cos();
                 self.position = FOLLOWING_CAMERA_POSITION;
                 self.calculate_matrix();
             }
             CameraKind::Moving => {
                 self.target = MOVING_CAMERA_TARGET;
-                self.position[0] = CAMERA_ORBIT_RADIUS * angle.sin();
-                self.position[1] = CAMERA_ORBIT_RADIUS * angle.cos();
-                self.position[2] = MOVING_CAMERA_Z;
+                self.position.x = CAMERA_ORBIT_RADIUS * angle.sin();
+                self.position.y = CAMERA_ORBIT_RADIUS * angle.cos();
+                self.position.z = MOVING_CAMERA_Z;
                 self.calculate_matrix();
             }
             CameraKind::Static => {

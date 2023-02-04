@@ -14,7 +14,7 @@ pub enum ShapeMovementType {
 pub struct Shape {
     pub transformed_polygons: Vec<Polygon>,
     polygons: Vec<Polygon>,
-    pub position: [i32; 3],
+    pub position: Point3<f32>,
     pub movement_type: ShapeMovementType,
     pub matrix: Matrix4<f32>,
 }
@@ -25,8 +25,8 @@ impl Movable for Shape {
             ShapeMovementType::Static => {}
             ShapeMovementType::Orbital => {
                 let angle = (tick * 2.5).rem_euclid(2.0 * std::f32::consts::PI) as f32;
-                self.position[0] = (SHAPE_ORBIT_RADIUS * angle.sin()) as i32;
-                self.position[1] = (SHAPE_ORBIT_RADIUS * angle.cos()) as i32;
+                self.position[0] = SHAPE_ORBIT_RADIUS * angle.sin();
+                self.position[1] = SHAPE_ORBIT_RADIUS * angle.cos();
                 let mut new_polygons = self.polygons.clone();
                 new_polygons
                     .iter_mut()
@@ -48,7 +48,7 @@ impl Movable for Shape {
 impl Shape {
     pub fn new(
         polygons: Vec<Polygon>,
-        position: [i32; 3],
+        position: Point3<f32>,
         movement_type: ShapeMovementType,
     ) -> Self {
         let mut new_polygons = polygons.clone();
