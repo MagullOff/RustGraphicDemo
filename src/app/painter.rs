@@ -16,9 +16,9 @@ pub fn is_in_range(p: Vector4<f32>) -> bool {
 
 fn calculate_point_vector(position: [i32; 3]) -> Vector4<f32> {
     Vector4::new(
-        (position[0] - (IMAGE_SIZE as i32 / 2)) as f32 / (IMAGE_SIZE / 2) as f32,
-        (position[1] - (IMAGE_SIZE as i32 / 2)) as f32 / (IMAGE_SIZE / 2) as f32,
-        (position[2] - (IMAGE_SIZE as i32 / 2)) as f32 / (IMAGE_SIZE / 2) as f32,
+        position[0] as f32,
+        position[1] as f32,
+        position[2] as f32,
         1.0,
     )
 }
@@ -59,9 +59,9 @@ impl GraphicDemo {
         color: Color32,
     ) {
         let a = 1.0;
-        let fov_deg = self.light_rotation;
-        let n = 0.5;
-        let f = 100.0;
+        let fov_deg = self.fov;
+        let n = 1.0;
+        let f = 3000.0;
         let fov = (fov_deg / 180.0) * std::f32::consts::PI;
 
         let perspective_matrix = Matrix4::new_perspective(a, fov, n, f);

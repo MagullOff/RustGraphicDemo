@@ -4,7 +4,7 @@ use crate::shape::{Shape, ShapeMovementType};
 use crate::utils::file_load::load_polygons;
 pub struct GraphicDemo {
     filling_type: FillingType,
-    light_rotation: f32,
+    fov: f32,
     light_parameters: LightParameters,
     shapes: Vec<Shape>,
     animation: bool,
@@ -31,7 +31,7 @@ impl Default for GraphicDemo {
     fn default() -> Self {
         GraphicDemo {
             filling_type: FillingType::Constant,
-            light_rotation: 90.0,
+            fov: 90.0,
             light_parameters: LightParameters {
                 kd: MAX_KD / 2.0,
                 ks: MAX_KS / 2.0,

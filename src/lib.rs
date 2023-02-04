@@ -9,7 +9,7 @@ pub mod consts {
 
     pub const STATIC_CAMERA_POSITION: [f32; 3] = [4.0, 4.0, 5.0];
     pub const STATIC_CAMERA_TARGET: [f32; 3] = [0.0, 0.0, 0.0];
-    pub const UP_VECTOR: [i32; 3] = [0, 1, 0];
+    pub const UP_VECTOR: [i32; 3] = [0, 0, 1];
 }
 
 mod app;

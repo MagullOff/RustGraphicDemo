@@ -57,7 +57,7 @@ impl GraphicDemo {
     fn options_ui(&mut self, ui: &mut Ui) {
         let Self {
             filling_type,
-            light_rotation,
+            fov,
             light_parameters,
             animation,
             camera,
@@ -66,7 +66,7 @@ impl GraphicDemo {
         let LightParameters { m, kd, ks } = light_parameters;
         ui.checkbox(&mut *animation, "Enable animation");
         ui.label("Camera rotation degree");
-        ui.add(egui::Slider::new(light_rotation, 0f32..=360f32).text("camera rotation angle"));
+        ui.add(egui::Slider::new(fov, 30f32..=120f32).text("field of view"));
         ui.separator();
         ui.label("Chose the camera");
         ui.radio_value(&mut camera.kind, CameraKind::Static, "Static");
@@ -82,11 +82,11 @@ impl GraphicDemo {
         ui.add(egui::Slider::new(m, 1f32..=MAX_M).text("m"));
         ui.add(egui::Slider::new(kd, 0.001..=MAX_KD).text("kd"));
         ui.add(egui::Slider::new(ks, 0.001..=MAX_KS).text("ks"));
-        ui.label("Light parameters");
+        ui.label("Camera position");
         ui.add(egui::Slider::new(&mut self.camera.position[0], -1000.0..=1000.0).text("x"));
         ui.add(egui::Slider::new(&mut self.camera.position[1], -1000.0..=1000.0).text("y"));
         ui.add(egui::Slider::new(&mut self.camera.position[2], -1000.0..=1000.0).text("z"));
-        ui.label("Light parameters");
+        ui.label("Target position");
         ui.add(egui::Slider::new(&mut self.camera.target[0], -500.0..=500.0).text("x"));
         ui.add(egui::Slider::new(&mut self.camera.target[1], -500.0..=500.0).text("y"));
         ui.add(egui::Slider::new(&mut self.camera.target[2], -10.0..=10.0).text("z"));
@@ -103,6 +103,5 @@ impl GraphicDemo {
             ),
             &Vector3::from_vec(UP_VECTOR.map(|a| a as f32).to_vec()),
         );
-        println!("{:?}", self.camera);
     }
 }
