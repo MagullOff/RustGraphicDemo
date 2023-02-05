@@ -34,7 +34,6 @@ impl Polygon {
 pub struct Vertex {
     pub position: Point3<f32>,
     pub normal: Vector3<f32>,
-    pub color: Vector3<f32>,
 }
 
 impl Vertex {

@@ -78,7 +78,6 @@ pub fn load_polygons(file_path: &str) -> Vec<Polygon> {
                             Vertex {
                                 position: positions,
                                 normal: v.normal().map(|[x, y, z]| Vector3::new(x, y, z)).unwrap(),
-                                color: Vector3::default(),
                             }
                         })
                         .collect();

@@ -5,7 +5,6 @@ use crate::{consts::*, polygon::Vertex};
 use egui::*;
 use itertools::Itertools;
 use nalgebra::{Matrix4, Point3, Vector3, Vector4};
-type Cords = (f32, f32, f32);
 
 pub fn is_in_range(p: Vector4<f32>) -> bool {
     (0..=2)
@@ -19,11 +18,11 @@ fn calculate_point_vector(position: Point3<f32>) -> Vector4<f32> {
 
 fn calculate_clip_cords(
     perspective_matrix: Matrix4<f32>,
-    view_matrixrix: Matrix4<f32>,
+    view_matrix: Matrix4<f32>,
     rotation_matrix: Matrix4<f32>,
     p: Vector4<f32>,
 ) -> Vector4<f32> {
-    perspective_matrix * (view_matrixrix * (rotation_matrix * p))
+    perspective_matrix * (view_matrix * (rotation_matrix * p))
 }
 
 fn draw_if_in_range(
@@ -55,37 +54,44 @@ impl GraphicDemo {
         color: Color32,
     ) {
         let a = 1.0;
-        let fov_deg = self.fov;
+        let fov_deg = 90.0;
         let fov = (fov_deg / 180.0) * std::f32::consts::PI;
 
         let perspective_matrix = Matrix4::new_perspective(a, fov, CAMERA_NEAR, CAMERA_FAR);
         let normalized_vertices = polygon
             .vertices
             .iter()
-            .map(|v| calculate_point_vector(v.position))
-            .map(|p| calculate_clip_cords(perspective_matrix, view_matrix, rotation_matrix, p))
-            .map(|clip_cords| (calculate_normalized_cords(clip_cords), clip_cords));
+            .map(|v| (calculate_point_vector(v.position), v.normal))
+            .map(|(p, normal)| {
+                (
+                    calculate_clip_cords(perspective_matrix, view_matrix, rotation_matrix, p),
+                    normal,
+                )
+            })
+            .map(|(clip_cords, normal)| {
+                ((calculate_normalized_cords(clip_cords), clip_cords), normal)
+            });
 
         let sus_polygon = Polygon {
             vertices: normalized_vertices
                 .clone()
-                .map(|(point, _)| Vertex {
+                .map(|((point, _), normal)| Vertex {
                     position: point,
-                    normal: Vector3::new(0.0, 0.0, 0.0),
-                    color: Vector3::new(0.0, 0.0, 0.0),
+                    normal,
                 })
                 .collect(),
         };
         self.fill_polygon(&sus_polygon, map, zbuffor, color);
-        normalized_vertices
-            .combinations(2)
-            .for_each(|pair| draw_if_in_range(pair[0], pair[1], map, Color32::WHITE));
+        // normalized_vertices
+        //     .map(|(x, _)| x)
+        //     .combinations(2)
+        //     .for_each(|pair| draw_if_in_range(pair[0], pair[1], map, Color32::WHITE));
     }
 
     pub fn paint(&mut self) -> egui::ColorImage {
         let mut map = ColorImage::new(
             [(IMAGE_SIZE + 1) as usize, (IMAGE_SIZE + 1) as usize],
-            Color32::TRANSPARENT,
+            Color32::BLACK,
         );
 
         let mut zbuffor: Vec<Vec<f32>> =

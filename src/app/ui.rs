@@ -82,10 +82,10 @@ impl GraphicDemo {
         ui.add(egui::Slider::new(m, 1f32..=MAX_M).text("m"));
         ui.add(egui::Slider::new(kd, 0.001..=MAX_KD).text("kd"));
         ui.add(egui::Slider::new(ks, 0.001..=MAX_KS).text("ks"));
-        // ui.label("Camera position");
-        // ui.add(egui::Slider::new(&mut self.camera.position[0], -1000.0..=1000.0).text("x"));
-        // ui.add(egui::Slider::new(&mut self.camera.position[1], -1000.0..=1000.0).text("y"));
-        // ui.add(egui::Slider::new(&mut self.camera.position[2], -1000.0..=1000.0).text("z"));
+        ui.label("light position");
+        ui.add(egui::Slider::new(&mut self.light.position[0], -1000.0..=1000.0).text("x"));
+        ui.add(egui::Slider::new(&mut self.light.position[1], -1000.0..=1000.0).text("y"));
+        ui.add(egui::Slider::new(&mut self.light.position[2], -1000.0..=1000.0).text("z"));
         // ui.label("Target position");
         // ui.add(egui::Slider::new(&mut self.camera.target[0], -1000.0..=1000.0).text("x"));
         // ui.add(egui::Slider::new(&mut self.camera.target[1], -1000.0..=1000.0).text("y"));
