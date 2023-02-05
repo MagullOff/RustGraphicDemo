@@ -3,7 +3,6 @@ use crate::camera::CameraKind;
 use crate::consts::*;
 use crate::traits::movable::Movable;
 use egui::*;
-use nalgebra::{Matrix4, Point3, Vector3};
 impl eframe::App for GraphicDemo {
     fn save(&mut self, _storage: &mut dyn eframe::Storage) {}
 
@@ -18,6 +17,7 @@ impl eframe::App for GraphicDemo {
                     shape.update(sec_since_midnight as f32);
                 }
                 self.camera.update(sec_since_midnight as f32);
+                self.lights[1].update(sec_since_midnight as f32);
                 ui.ctx().request_repaint();
             }
             let bitmap = self.paint();
@@ -82,10 +82,6 @@ impl GraphicDemo {
         ui.add(egui::Slider::new(m, 1f32..=MAX_M).text("m"));
         ui.add(egui::Slider::new(kd, 0.001..=MAX_KD).text("kd"));
         ui.add(egui::Slider::new(ks, 0.001..=MAX_KS).text("ks"));
-        ui.label("light position");
-        ui.add(egui::Slider::new(&mut self.light.position[0], -1000.0..=1000.0).text("x"));
-        ui.add(egui::Slider::new(&mut self.light.position[1], -1000.0..=1000.0).text("y"));
-        ui.add(egui::Slider::new(&mut self.light.position[2], -1000.0..=1000.0).text("z"));
         // ui.label("Target position");
         // ui.add(egui::Slider::new(&mut self.camera.target[0], -1000.0..=1000.0).text("x"));
         // ui.add(egui::Slider::new(&mut self.camera.target[1], -1000.0..=1000.0).text("y"));

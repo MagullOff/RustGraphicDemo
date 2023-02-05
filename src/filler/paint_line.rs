@@ -1,9 +1,9 @@
 use super::edge::Edge;
+use crate::consts::AMBIENT_KA;
 use crate::polygon::{Polygon, Vertex};
 use crate::utils::vector::Vector;
 use crate::GraphicDemo;
 use egui::{Color32, ColorImage};
-use nalgebra::Vector3;
 use nalgebra::{Point2, Point3};
 
 fn get_barocenttric_coordinates(vertices: &[Vertex], point: Point2<i32>) -> (f32, f32, f32) {
@@ -36,8 +36,13 @@ impl GraphicDemo {
         r_vec: Vector,
         cords: (u32, u32),
         color1: Color32,
+        light_color: Color32,
     ) -> Vector {
-        let light_rgb = [1.0, 1.0, 1.0];
+        let light_rgb = [
+            light_color.r() as f32 / 255.0,
+            light_color.g() as f32 / 255.0,
+            light_color.b() as f32 / 255.0,
+        ];
         let color = [
             color1.r() as f32 / 255.0,
             color1.g() as f32 / 255.0,
@@ -83,11 +88,11 @@ impl GraphicDemo {
         let mut i = 0;
         while i <= (aet.len() as i8) - 2 {
             for x in (aet[i as usize].min as i32)..(aet[(i + 1) as usize].min as i32) {
-                let (w1, w2, w3) =
+                let bacrocentric_coordinates =
                     get_barocenttric_coordinates(&polygon.vertices, Point2::new(x, y));
 
-                let z = get_interpolated_z(&polygon.vertices, (w1, w2, w3));
-
+                let z = get_interpolated_z(&polygon.vertices, bacrocentric_coordinates);
+                let (w1, w2, w3) = bacrocentric_coordinates;
                 if z > zbuffor[x as usize][y as usize] {
                     return;
                 }
@@ -105,19 +110,21 @@ impl GraphicDemo {
 
                 let n_vec = true_normal.norm();
 
-                let l_vec = self
+                let v_vec = self.get_view_vector(&Point3::new(x as f32, y as f32, z));
+                let rgb_vec = self
                     .get_light_vector(&Point3::new(x as f32, y as f32, z))
-                    .norm();
-                let v_vec = self
-                    .get_view_vector(&Point3::new(x as f32, y as f32, z))
-                    .norm();
-                let r_vec = n_vec.multiply(n_vec * l_vec * 2.0) - l_vec;
-                let rgb = self.get_color(n_vec, l_vec, v_vec, r_vec, (x as u32, y as u32), color);
+                    .into_iter()
+                    .map(|(vec, col)| {
+                        let r_vec = n_vec.multiply(n_vec * vec * 2.0) - vec;
+                        self.get_color(n_vec, vec, v_vec, r_vec, (x as u32, y as u32), color, col)
+                    })
+                    .fold(Vector::new(0.0, 0.0, 0.0), |acc, val| acc + val);
                 let rgb_res = Color32::from_rgb(
-                    (rgb.x * 255.0) as u8,
-                    (rgb.y * 255.0) as u8,
-                    (rgb.z * 255.0) as u8,
+                    (rgb_vec.x * 255.0) as u8 + AMBIENT_KA,
+                    (rgb_vec.y * 255.0) as u8 + AMBIENT_KA,
+                    (rgb_vec.z * 255.0) as u8 + AMBIENT_KA,
                 );
+
                 map[(x as usize, y as usize)] = rgb_res;
                 zbuffor[x as usize][y as usize] = z;
             }

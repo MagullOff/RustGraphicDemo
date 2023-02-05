@@ -1,6 +1,6 @@
 use crate::camera::Camera;
 use crate::consts::*;
-use crate::light::point_light::PointLight;
+use crate::light::Light;
 use crate::shape::{Shape, ShapeMovementType};
 use crate::utils::file_load::load_polygons;
 use crate::utils::vector::Vector;
@@ -10,7 +10,7 @@ pub struct GraphicDemo {
     filling_type: FillingType,
     pub fov: f32,
     pub light_parameters: LightParameters,
-    pub light: PointLight,
+    pub lights: Vec<Light>,
     shapes: Vec<Shape>,
     animation: bool,
     pub camera: Camera,
@@ -45,36 +45,51 @@ impl Default for GraphicDemo {
             animation: true,
             shapes: vec![
                 Shape::new(
-                    load_polygons("assets/cube.obj"),
+                    load_polygons("assets/sphere.obj"),
                     Point3::new(0.0, -150.0, 0.0),
                     ShapeMovementType::Static,
-                    Color32::GRAY,
+                    Color32::WHITE,
                 ),
                 Shape::new(
-                    load_polygons("assets/cube.obj"),
+                    load_polygons("assets/sphere.obj"),
                     Point3::new(0.0, 150.0, 0.0),
                     ShapeMovementType::Static,
-                    Color32::BLUE,
+                    Color32::WHITE,
                 ),
                 Shape::new(
-                    load_polygons("assets/cube.obj"),
+                    load_polygons("assets/sphere.obj"),
                     Point3::new(0.0, 0.0, 0.0),
                     ShapeMovementType::Orbital,
-                    Color32::RED,
+                    Color32::WHITE,
                 ),
             ],
             camera: Camera::default(),
-            light: PointLight::default(),
+            lights: vec![
+                *Light::default()
+                    .set_position(STATIC_LIGHT_POSITION)
+                    .set_color(Color32::RED),
+                *Light::default()
+                    .set_target(DYNAMIC_LIGHT_TARGET)
+                    .set_color(Color32::BLUE),
+            ],
         }
     }
 }
 
 impl GraphicDemo {
     pub fn get_view_vector(&self, position: &Point3<f32>) -> Vector {
-        Vector::from(self.camera.position - position)
+        Vector::from(self.camera.position - position).norm()
     }
 
-    pub fn get_light_vector(&self, position: &Point3<f32>) -> Vector {
-        Vector::from(self.light.position - position)
+    pub fn get_light_vector(&self, position: &Point3<f32>) -> Vec<(Vector, Color32)> {
+        self.lights
+            .iter()
+            .map(|light| {
+                (
+                    Vector::from(light.get_position() - position).norm(),
+                    light.get_color(),
+                )
+            })
+            .collect()
     }
 }
