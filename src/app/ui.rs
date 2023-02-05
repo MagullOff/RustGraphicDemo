@@ -2,6 +2,7 @@ use super::{FillingType, GraphicDemo, LightParameters};
 use crate::camera::CameraKind;
 use crate::consts::*;
 use crate::traits::movable::Movable;
+use crate::utils::types::*;
 use egui::*;
 impl eframe::App for GraphicDemo {
     fn save(&mut self, _storage: &mut dyn eframe::Storage) {}
@@ -84,22 +85,22 @@ impl GraphicDemo {
         ui.add(egui::Slider::new(m, 1f32..=MAX_M).text("m"));
         ui.add(egui::Slider::new(kd, 0.001..=MAX_KD).text("kd"));
         ui.add(egui::Slider::new(ks, 0.001..=MAX_KS).text("ks"));
-        // ui.label("Target position");
-        // ui.add(egui::Slider::new(&mut self.camera.target[0], -1000.0..=1000.0).text("x"));
-        // ui.add(egui::Slider::new(&mut self.camera.target[1], -1000.0..=1000.0).text("y"));
-        // ui.add(egui::Slider::new(&mut self.camera.target[2], -1000.0..=1000.0).text("z"));
-        // self.camera.matrix = Matrix4::look_at_rh(
-        //     &Point3::new(
-        //         self.camera.position[0] as f32,
-        //         self.camera.position[1] as f32,
-        //         self.camera.position[2] as f32,
-        //     ),
-        //     &Point3::new(
-        //         self.camera.target[0] as f32,
-        //         self.camera.target[1] as f32,
-        //         self.camera.target[2] as f32,
-        //     ),
-        //     &Vector3::from_vec(UP_VECTOR.map(|a| a as f32).to_vec()),
-        // );
+        ui.label("Target position");
+        ui.add(egui::Slider::new(&mut self.camera.position[0], -1000.0..=1000.0).text("x"));
+        ui.add(egui::Slider::new(&mut self.camera.position[1], -1000.0..=1000.0).text("y"));
+        ui.add(egui::Slider::new(&mut self.camera.position[2], -1000.0..=1000.0).text("z"));
+        self.camera.matrix = Matrix4::look_at_rh(
+            &Point3::new(
+                self.camera.position[0] as f32,
+                self.camera.position[1] as f32,
+                self.camera.position[2] as f32,
+            ),
+            &Point3::new(
+                self.camera.target[0] as f32,
+                self.camera.target[1] as f32,
+                self.camera.target[2] as f32,
+            ),
+            &UP_VECTOR,
+        );
     }
 }

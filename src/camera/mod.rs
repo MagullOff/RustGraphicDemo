@@ -64,9 +64,9 @@ impl Movable for Camera {
                 self.calculate_matrix();
             }
             CameraKind::Static => {
-                self.position = STATIC_CAMERA_POSITION;
-                self.target = STATIC_CAMERA_TARGET;
-                self.calculate_matrix();
+                // self.position = STATIC_CAMERA_POSITION;
+                // self.target = STATIC_CAMERA_TARGET;
+                // self.calculate_matrix();
             }
         }
     }

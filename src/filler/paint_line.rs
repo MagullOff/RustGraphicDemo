@@ -49,15 +49,16 @@ impl GraphicDemo {
             color1.g() as f32 / 255.0,
             color1.b() as f32 / 255.0,
         ];
-        let view_angle_multiplyer = Vector::cos(v_vec.multiply(-1.0), r_vec)
+        let view_angle_multiplyer = Vector::cos(v_vec, r_vec)
             .max(0.0)
             .powf(self.light_parameters.m);
+
         let target_multiplier = match direction {
-            Some(vec) => Vector::cos(Vector::from(vec).multiply(-1.0), r_vec).max(0.0),
+            Some(vec) => Vector::cos(Vector::from(vec), r_vec).max(0.0),
             None => 1.0,
         };
 
-        let light_angle_multiplyer = Vector::cos(n_vec, l_vec).max(0.0);
+        let light_angle_multiplyer = Vector::cos(n_vec, l_vec.norm()).max(0.0);
         let rgb = (0..=2)
             .map(|i| {
                 self.get_color_component(
@@ -144,9 +145,9 @@ impl GraphicDemo {
                     })
                     .fold(Vector::new(0.0, 0.0, 0.0), |acc, val| acc + val);
                 let rgb_res = Color32::from_rgb(
-                    (rgb_vec.x * 255.0) as u8 + AMBIENT_KA,
-                    (rgb_vec.y * 255.0) as u8 + AMBIENT_KA,
-                    (rgb_vec.z * 255.0) as u8 + AMBIENT_KA,
+                    (rgb_vec.x * 255.0) as u8,
+                    (rgb_vec.y * 255.0) as u8,
+                    (rgb_vec.z * 255.0) as u8,
                 );
 
                 map[(x as usize, y as usize)] = rgb_res;
