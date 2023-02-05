@@ -35,6 +35,13 @@ fn draw_if_in_range(
         draw_bresenham_line(map, point1.0, point2.0, color);
     }
 }
+
+fn check_if_in_range(
+    point1: (Point3<f32>, Vector4<f32>),
+    point2: (Point3<f32>, Vector4<f32>),
+) -> bool {
+    is_in_range(point1.1) && is_in_range(point2.1)
+}
 fn calculate_normalized_cords(p: Vector4<f32>) -> Point3<f32> {
     Point3::new(
         (p[0] / p[3] + 1.0) / 2.0 * IMAGE_SIZE as f32,
@@ -81,11 +88,14 @@ impl GraphicDemo {
                 })
                 .collect(),
         };
-        self.fill_polygon(&sus_polygon, map, zbuffor, color);
-        // normalized_vertices
-        //     .map(|(x, _)| x)
-        //     .combinations(2)
-        //     .for_each(|pair| draw_if_in_range(pair[0], pair[1], map, Color32::WHITE));
+        let is_not_clipped = normalized_vertices
+            .map(|(x, _)| x)
+            .combinations(2)
+            .map(|pair| check_if_in_range(pair[0], pair[1]))
+            .all(|cond| cond);
+        if is_not_clipped {
+            self.fill_polygon(&sus_polygon, map, zbuffor, color);
+        }
     }
 
     pub fn paint(&mut self) -> egui::ColorImage {
