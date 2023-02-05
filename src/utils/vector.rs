@@ -1,3 +1,4 @@
+use nalgebra::Vector3;
 use std::ops::{Add, Mul, Sub};
 
 #[derive(Debug, Clone, Copy)]
@@ -81,3 +82,9 @@ impl PartialEq for Vector {
 }
 
 impl Eq for Vector {}
+
+impl From<Vector3<f32>> for Vector {
+    fn from(value: Vector3<f32>) -> Self {
+        Vector::new(value.x, value.y, value.z)
+    }
+}

@@ -3,6 +3,7 @@ use crate::consts::*;
 use crate::light::point_light::PointLight;
 use crate::shape::{Shape, ShapeMovementType};
 use crate::utils::file_load::load_polygons;
+use crate::utils::vector::Vector;
 use egui::Color32;
 use nalgebra::Point3;
 pub struct GraphicDemo {
@@ -56,8 +57,8 @@ impl Default for GraphicDemo {
                     Color32::BLUE,
                 ),
                 Shape::new(
-                    load_polygons("assets/sphere.obj"),
-                    Point3::new(0.0, -150.0, 0.0),
+                    load_polygons("assets/cube.obj"),
+                    Point3::new(0.0, 0.0, 0.0),
                     ShapeMovementType::Orbital,
                     Color32::RED,
                 ),
@@ -65,5 +66,15 @@ impl Default for GraphicDemo {
             camera: Camera::default(),
             light: PointLight::default(),
         }
+    }
+}
+
+impl GraphicDemo {
+    pub fn get_view_vector(&self, position: &Point3<f32>) -> Vector {
+        Vector::from(self.camera.position - position)
+    }
+
+    pub fn get_light_vector(&self, position: &Point3<f32>) -> Vector {
+        Vector::from(self.light.position - position)
     }
 }
