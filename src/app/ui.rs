@@ -17,7 +17,9 @@ impl eframe::App for GraphicDemo {
                     shape.update(sec_since_midnight as f32);
                 }
                 self.camera.update(sec_since_midnight as f32);
-                self.lights[1].update(sec_since_midnight as f32);
+                self.lights
+                    .iter_mut()
+                    .for_each(|l| l.update(sec_since_midnight as f32));
                 ui.ctx().request_repaint();
             }
             let bitmap = self.paint();

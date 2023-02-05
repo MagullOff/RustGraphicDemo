@@ -87,7 +87,10 @@ pub fn load_polygons(file_path: &str) -> Vec<Polygon> {
                 })
                 .collect::<Vec<Polygon>>()
         }
-        Err(_) => vec![],
+        Err(e) => {
+            println!("{:?}", e);
+            vec![]
+        }
     }
 }
 

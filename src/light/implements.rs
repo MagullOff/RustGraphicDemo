@@ -1,5 +1,5 @@
 use super::Light;
-use crate::utils::types::Point3;
+use crate::utils::types::{Point3, Vector3};
 use egui::Color32;
 impl Light {
     pub fn get_position(&self) -> Point3 {
@@ -23,5 +23,8 @@ impl Light {
     pub fn set_color(&mut self, color: Color32) -> &mut Self {
         self.color = color;
         self
+    }
+    pub fn get_direction(&self) -> Option<Vector3> {
+        self.direction
     }
 }

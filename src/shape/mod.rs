@@ -34,14 +34,14 @@ impl Movable for Shape {
                     .iter_mut()
                     .for_each(|p| p.move_vertices(self.position));
                 self.transformed_polygons = new_polygons;
-                self.matrix = Matrix4::new_rotation_wrt_point(
-                    Vector3::from_vec(vec![0.0, 0.0, angle]),
-                    Point3::new(
-                        self.position[0] as f32,
-                        self.position[1] as f32,
-                        self.position[2] as f32,
-                    ),
-                )
+                // self.matrix = Matrix4::new_rotation_wrt_point(
+                //     Vector3::from_vec(vec![0.0, 0.0, angle]),
+                //     Point3::new(
+                //         self.position[0] as f32,
+                //         self.position[1] as f32,
+                //         self.position[2] as f32,
+                //     ),
+                // )
             }
         }
     }

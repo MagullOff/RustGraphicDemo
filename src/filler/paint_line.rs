@@ -1,7 +1,7 @@
 use super::edge::Edge;
 use crate::consts::AMBIENT_KA;
 use crate::polygon::{Polygon, Vertex};
-use crate::utils::types::{Point2, Point3};
+use crate::utils::types::{Point2, Point3, Vector3};
 use crate::utils::vector::Vector;
 use crate::GraphicDemo;
 use egui::{Color32, ColorImage};
@@ -37,6 +37,7 @@ impl GraphicDemo {
         _cords: (u32, u32),
         color1: Color32,
         light_color: Color32,
+        direction: Option<Vector3>,
     ) -> Vector {
         let light_rgb = [
             light_color.r() as f32 / 255.0,
@@ -48,9 +49,14 @@ impl GraphicDemo {
             color1.g() as f32 / 255.0,
             color1.b() as f32 / 255.0,
         ];
-        let view_angle_multiplyer = Vector::cos(v_vec, r_vec)
+        let view_angle_multiplyer = Vector::cos(v_vec.multiply(-1.0), r_vec)
             .max(0.0)
             .powf(self.light_parameters.m);
+        let target_multiplier = match direction {
+            Some(vec) => Vector::cos(Vector::from(vec).multiply(-1.0), r_vec).max(0.0),
+            None => 1.0,
+        };
+
         let light_angle_multiplyer = Vector::cos(n_vec, l_vec).max(0.0);
         let rgb = (0..=2)
             .map(|i| {
@@ -59,6 +65,7 @@ impl GraphicDemo {
                     color[i],
                     light_angle_multiplyer,
                     view_angle_multiplyer,
+                    target_multiplier,
                 )
             })
             .collect::<Vec<f32>>();
@@ -71,9 +78,17 @@ impl GraphicDemo {
         color_component: f32,
         light_angle_multiplyer: f32,
         view_angle_multiplyer: f32,
+        target_multiplier: f32,
     ) -> f32 {
-        self.light_parameters.kd * light_component * color_component * light_angle_multiplyer
-            + self.light_parameters.ks * light_component * color_component * view_angle_multiplyer
+        target_multiplier
+            * (self.light_parameters.kd
+                * light_component
+                * color_component
+                * light_angle_multiplyer
+                + self.light_parameters.ks
+                    * light_component
+                    * color_component
+                    * view_angle_multiplyer)
     }
 
     pub fn paint_line(
@@ -114,9 +129,18 @@ impl GraphicDemo {
                 let rgb_vec = self
                     .get_light_vector(&Point3::new(x as f32, y as f32, z))
                     .into_iter()
-                    .map(|(vec, col)| {
+                    .map(|(vec, col, direction)| {
                         let r_vec = n_vec.multiply(n_vec * vec * 2.0) - vec;
-                        self.get_color(n_vec, vec, v_vec, r_vec, (x as u32, y as u32), color, col)
+                        self.get_color(
+                            n_vec,
+                            vec,
+                            v_vec,
+                            r_vec,
+                            (x as u32, y as u32),
+                            color,
+                            col,
+                            direction,
+                        )
                     })
                     .fold(Vector::new(0.0, 0.0, 0.0), |acc, val| acc + val);
                 let rgb_res = Color32::from_rgb(
