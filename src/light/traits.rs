@@ -1,7 +1,7 @@
 use super::Light;
 use crate::consts::*;
 use crate::traits::movable::Movable;
-use nalgebra::Point3;
+use crate::utils::types::Point3;
 impl Movable for Light {
     fn update(&mut self, tick: f32) {
         match self.direction {

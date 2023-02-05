@@ -1,6 +1,6 @@
 pub mod polygon;
+use crate::utils::types::*;
 use egui::Color32;
-use nalgebra::{Matrix4, Point3, Vector3};
 use polygon::Polygon;
 
 use crate::{consts::SHAPE_ORBIT_RADIUS, traits::movable::Movable};
@@ -15,9 +15,9 @@ pub enum ShapeMovementType {
 pub struct Shape {
     pub transformed_polygons: Vec<Polygon>,
     polygons: Vec<Polygon>,
-    pub position: Point3<f32>,
+    pub position: Point3,
     pub movement_type: ShapeMovementType,
-    pub matrix: Matrix4<f32>,
+    pub matrix: Matrix4,
     pub color: Color32,
 }
 
@@ -50,7 +50,7 @@ impl Movable for Shape {
 impl Shape {
     pub fn new(
         polygons: Vec<Polygon>,
-        position: Point3<f32>,
+        position: Point3,
         movement_type: ShapeMovementType,
         color: Color32,
     ) -> Self {

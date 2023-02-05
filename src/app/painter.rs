@@ -1,33 +1,33 @@
 use super::GraphicDemo;
 use crate::polygon::Polygon;
 use crate::utils::bresenham::draw_bresenham_line;
+use crate::utils::types::{Matrix4, Point3, Vector4};
 use crate::{consts::*, polygon::Vertex};
 use egui::*;
 use itertools::Itertools;
-use nalgebra::{Matrix4, Point3, Vector3, Vector4};
 
-pub fn is_in_range(p: Vector4<f32>) -> bool {
+pub fn is_in_range(p: Vector4) -> bool {
     (0..=2)
         .map(|i| p[i] > -p[3] && p[i] < p[3])
         .all(|cond| cond)
 }
 
-fn calculate_point_vector(position: Point3<f32>) -> Vector4<f32> {
+fn calculate_point_vector(position: Point3) -> Vector4 {
     Vector4::new(position.x, position.y, position.z, 1.0)
 }
 
 fn calculate_clip_cords(
-    perspective_matrix: Matrix4<f32>,
-    view_matrix: Matrix4<f32>,
-    rotation_matrix: Matrix4<f32>,
-    p: Vector4<f32>,
-) -> Vector4<f32> {
+    perspective_matrix: Matrix4,
+    view_matrix: Matrix4,
+    rotation_matrix: Matrix4,
+    p: Vector4,
+) -> Vector4 {
     perspective_matrix * (view_matrix * (rotation_matrix * p))
 }
 
 fn draw_if_in_range(
-    point1: (Point3<f32>, Vector4<f32>),
-    point2: (Point3<f32>, Vector4<f32>),
+    point1: (Point3, Vector4),
+    point2: (Point3, Vector4),
     map: &mut ColorImage,
     color: Color32,
 ) {
@@ -36,13 +36,10 @@ fn draw_if_in_range(
     }
 }
 
-fn check_if_in_range(
-    point1: (Point3<f32>, Vector4<f32>),
-    point2: (Point3<f32>, Vector4<f32>),
-) -> bool {
+fn check_if_in_range(point1: (Point3, Vector4), point2: (Point3, Vector4)) -> bool {
     is_in_range(point1.1) && is_in_range(point2.1)
 }
-fn calculate_normalized_cords(p: Vector4<f32>) -> Point3<f32> {
+fn calculate_normalized_cords(p: Vector4) -> Point3 {
     Point3::new(
         (p[0] / p[3] + 1.0) / 2.0 * IMAGE_SIZE as f32,
         (p[1] / p[3] + 1.0) / 2.0 * IMAGE_SIZE as f32,
@@ -53,8 +50,8 @@ fn calculate_normalized_cords(p: Vector4<f32>) -> Point3<f32> {
 impl GraphicDemo {
     fn draw_lines(
         &self,
-        view_matrix: Matrix4<f32>,
-        rotation_matrix: Matrix4<f32>,
+        view_matrix: Matrix4,
+        rotation_matrix: Matrix4,
         polygon: &Polygon,
         map: &mut ColorImage,
         zbuffor: &mut Vec<Vec<f32>>,

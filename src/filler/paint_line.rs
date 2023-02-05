@@ -1,12 +1,12 @@
 use super::edge::Edge;
 use crate::consts::AMBIENT_KA;
 use crate::polygon::{Polygon, Vertex};
+use crate::utils::types::{Point2, Point3};
 use crate::utils::vector::Vector;
 use crate::GraphicDemo;
 use egui::{Color32, ColorImage};
-use nalgebra::{Point2, Point3};
 
-fn get_barocenttric_coordinates(vertices: &[Vertex], point: Point2<i32>) -> (f32, f32, f32) {
+fn get_barocenttric_coordinates(vertices: &[Vertex], point: Point2) -> (f32, f32, f32) {
     let (x1, y1) = (
         vertices[0].position[0] as i32,
         vertices[0].position[1] as i32,
@@ -34,7 +34,7 @@ impl GraphicDemo {
         l_vec: Vector,
         v_vec: Vector,
         r_vec: Vector,
-        cords: (u32, u32),
+        _cords: (u32, u32),
         color1: Color32,
         light_color: Color32,
     ) -> Vector {

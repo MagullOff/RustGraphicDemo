@@ -1,4 +1,4 @@
-use nalgebra::{Point3, Vector3};
+use crate::utils::types::*;
 
 #[derive(Clone, Debug)]
 pub struct Polygon {
@@ -12,7 +12,7 @@ impl Polygon {
             .iter()
             .map(|v| v.position)
             .enumerate()
-            .collect::<Vec<(usize, Point3<f32>)>>();
+            .collect::<Vec<(usize, Point3)>>();
         sort_vec.sort_by(|(_, p1), (_, p2)| {
             if p1.y < p2.y || (p1.y == p2.y && p1.x < p2.x) {
                 std::cmp::Ordering::Less
@@ -23,7 +23,7 @@ impl Polygon {
         sort_vec.iter().map(|elem| elem.0).collect()
     }
 
-    pub fn move_vertices(&mut self, vector: Point3<f32>) {
+    pub fn move_vertices(&mut self, vector: Point3) {
         self.vertices
             .iter_mut()
             .for_each(|v| v.move_by_vector(vector));
@@ -32,12 +32,12 @@ impl Polygon {
 
 #[derive(Clone, Debug)]
 pub struct Vertex {
-    pub position: Point3<f32>,
-    pub normal: Vector3<f32>,
+    pub position: Point3,
+    pub normal: Vector3,
 }
 
 impl Vertex {
-    fn move_by_vector(&mut self, vector: Point3<f32>) {
+    fn move_by_vector(&mut self, vector: Point3) {
         (0..=2).for_each(|i| self.position[i] += vector[i]);
     }
 }

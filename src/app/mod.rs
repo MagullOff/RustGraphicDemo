@@ -3,9 +3,10 @@ use crate::consts::*;
 use crate::light::Light;
 use crate::shape::{Shape, ShapeMovementType};
 use crate::utils::file_load::load_polygons;
+use crate::utils::types::Point3;
 use crate::utils::vector::Vector;
 use egui::Color32;
-use nalgebra::Point3;
+
 pub struct GraphicDemo {
     filling_type: FillingType,
     pub fov: f32,
@@ -77,11 +78,11 @@ impl Default for GraphicDemo {
 }
 
 impl GraphicDemo {
-    pub fn get_view_vector(&self, position: &Point3<f32>) -> Vector {
+    pub fn get_view_vector(&self, position: &Point3) -> Vector {
         Vector::from(self.camera.position - position).norm()
     }
 
-    pub fn get_light_vector(&self, position: &Point3<f32>) -> Vec<(Vector, Color32)> {
+    pub fn get_light_vector(&self, position: &Point3) -> Vec<(Vector, Color32)> {
         self.lights
             .iter()
             .map(|light| {

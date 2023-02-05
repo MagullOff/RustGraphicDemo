@@ -1,6 +1,6 @@
 use crate::consts::*;
 use crate::traits::movable::Movable;
-use nalgebra::{Matrix4, Point3};
+use crate::utils::types::{Matrix4, Point3};
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum CameraKind {
@@ -11,9 +11,9 @@ pub enum CameraKind {
 
 #[derive(Debug)]
 pub struct Camera {
-    pub position: Point3<f32>,
-    pub target: Point3<f32>,
-    pub matrix: Matrix4<f32>,
+    pub position: Point3,
+    pub target: Point3,
+    pub matrix: Matrix4,
     pub kind: CameraKind,
 }
 
