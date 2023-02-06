@@ -34,7 +34,7 @@ impl Movable for Shape {
                     .iter_mut()
                     .for_each(|p| p.move_vertices(self.position));
                 self.transformed_polygons = new_polygons;
-                let angle = (self.position[0] / self.position[2]).atan();
+                let _angle = (self.position[0] / self.position[2]).atan();
                 // self.matrix = Matrix4::new_rotation_wrt_point(
                 //     Vector3::from_vec(vec![0.0, angle, 0.0]),
                 //     Point3::new(

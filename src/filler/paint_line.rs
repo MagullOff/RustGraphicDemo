@@ -175,7 +175,22 @@ impl GraphicDemo {
                 let rgb_res = match polygon_color {
                     ColorInterpolation::Constant(polygon_color) => polygon_color,
                     ColorInterpolation::Phong => {
-                        to_color(self.get_color_at(polygon, polygon.vertices[0].position, color))
+                        let (w1, w2, w3) = get_barocenttric_coordinates(
+                            &polygon.vertices.iter().map(|v| v.position).collect_vec(),
+                            Point2::new(x as i32, y as i32),
+                        );
+                        let position = Point3::new(
+                            polygon.vertices[0].position.x * w1
+                                + polygon.vertices[1].position.x * w2
+                                + polygon.vertices[2].position.x * w3,
+                            polygon.vertices[0].position.y * w1
+                                + polygon.vertices[1].position.y * w2
+                                + polygon.vertices[2].position.y * w3,
+                            polygon.vertices[0].position.z * w1
+                                + polygon.vertices[1].position.z * w2
+                                + polygon.vertices[2].position.z * w3,
+                        );
+                        to_color(self.get_color_at(polygon, position, color))
                     }
                     ColorInterpolation::Gouraud(color_vec) => {
                         let (w1, w2, w3) = get_barocenttric_coordinates(

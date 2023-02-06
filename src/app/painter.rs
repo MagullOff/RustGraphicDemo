@@ -94,6 +94,7 @@ impl GraphicDemo {
                 .into_iter()
                 .for_each(|index| map[index] = Color32::WHITE);
         }
+
         map
     }
 }
