@@ -3,30 +3,28 @@ use crate::utils::types::*;
 #[derive(Clone, Debug)]
 pub struct Polygon {
     pub vertices: Vec<Vertex>,
+    pub center: Point3,
 }
 
 impl Polygon {
-    pub fn get_sorted_indeces(&self) -> Vec<usize> {
-        let mut sort_vec = self
-            .vertices
-            .iter()
-            .map(|v| v.position)
-            .enumerate()
-            .collect::<Vec<(usize, Point3)>>();
-        sort_vec.sort_by(|(_, p1), (_, p2)| {
-            if p1.y < p2.y || (p1.y == p2.y && p1.x < p2.x) {
-                std::cmp::Ordering::Less
-            } else {
-                std::cmp::Ordering::Greater
-            }
-        });
-        sort_vec.iter().map(|elem| elem.0).collect()
-    }
-
     pub fn move_vertices(&mut self, vector: Point3) {
         self.vertices
             .iter_mut()
             .for_each(|v| v.move_by_vector(vector));
+    }
+
+    pub fn new(vertices: Vec<Vertex>) -> Self {
+        let length = vertices.len() as f32;
+        let (x, y, z) = &vertices
+            .iter()
+            .map(|v| (v.position.x, v.position.y, v.position.z))
+            .fold((0f32, 0f32, 0f32), |acc, val| {
+                (acc.0 + val.0, acc.1 + val.1, acc.2 + val.2)
+            });
+        Polygon {
+            vertices,
+            center: Point3::new(x / length, y / length, z / length),
+        }
     }
 }
 

@@ -25,19 +25,8 @@ fn calculate_clip_cords(
     perspective_matrix * (view_matrix * (rotation_matrix * p))
 }
 
-fn draw_if_in_range(
-    point1: (Point3, Vector4),
-    point2: (Point3, Vector4),
-    map: &mut ColorImage,
-    color: Color32,
-) {
-    if is_in_range(point1.1) && is_in_range(point2.1) {
-        draw_bresenham_line(map, point1.0, point2.0, color);
-    }
-}
-
-fn check_if_in_range(point1: (Point3, Vector4), point2: (Point3, Vector4)) -> bool {
-    is_in_range(point1.1) && is_in_range(point2.1)
+fn check_if_in_range(point1: Vector4, point2: Vector4) -> bool {
+    is_in_range(point1) && is_in_range(point2)
 }
 fn calculate_normalized_cords(p: Vector4) -> Point3 {
     Point3::new(
@@ -64,33 +53,17 @@ impl GraphicDemo {
         let normalized_vertices = polygon
             .vertices
             .iter()
-            .map(|v| (calculate_point_vector(v.position), v.normal))
-            .map(|(p, normal)| {
-                (
-                    calculate_clip_cords(perspective_matrix, view_matrix, rotation_matrix, p),
-                    normal,
-                )
-            })
-            .map(|(clip_cords, normal)| {
-                ((calculate_normalized_cords(clip_cords), clip_cords), normal)
-            });
+            .map(|v| calculate_point_vector(v.position))
+            .map(|p| calculate_clip_cords(perspective_matrix, view_matrix, rotation_matrix, p))
+            .map(|clip_cords| (calculate_normalized_cords(clip_cords), clip_cords));
 
-        let sus_polygon = Polygon {
-            vertices: normalized_vertices
-                .clone()
-                .map(|((point, _), normal)| Vertex {
-                    position: point,
-                    normal,
-                })
-                .collect(),
-        };
+        let viewport_vertices = normalized_vertices.clone().map(|(p, _)| p).collect_vec();
         let is_not_clipped = normalized_vertices
-            .map(|(x, _)| x)
             .combinations(2)
-            .map(|pair| check_if_in_range(pair[0], pair[1]))
+            .map(|pair| check_if_in_range(pair[0].1, pair[1].1))
             .all(|cond| cond);
         if is_not_clipped {
-            self.fill_polygon(&sus_polygon, map, zbuffor, color);
+            self.fill_polygon(&polygon, &viewport_vertices, map, zbuffor, color);
         }
     }
 

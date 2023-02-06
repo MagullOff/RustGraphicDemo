@@ -8,7 +8,7 @@ use crate::utils::vector::Vector;
 use egui::Color32;
 
 pub struct GraphicDemo {
-    filling_type: FillingType,
+    pub shading_type: ShadingType,
     pub fov: f32,
     pub light_parameters: LightParameters,
     pub lights: Vec<Light>,
@@ -24,7 +24,7 @@ pub struct LightParameters {
 }
 
 #[derive(PartialEq, Eq)]
-pub enum FillingType {
+pub enum ShadingType {
     Constant,
     Gouraud,
     Phong,
@@ -36,7 +36,7 @@ pub mod ui;
 impl Default for GraphicDemo {
     fn default() -> Self {
         GraphicDemo {
-            filling_type: FillingType::Constant,
+            shading_type: ShadingType::Phong,
             fov: 90.0,
             light_parameters: LightParameters {
                 kd: MAX_KD / 2.0,
@@ -58,16 +58,21 @@ impl Default for GraphicDemo {
                     Color32::WHITE,
                 ),
                 Shape::new(
-                    load_polygons("assets/cube.obj"),
+                    load_polygons("assets/sphere.obj"),
                     Point3::new(0.0, 0.0, 0.0),
                     ShapeMovementType::Orbital,
                     Color32::WHITE,
                 ),
             ],
             camera: Camera::default(),
-            lights: vec![*Light::default()
-                .set_target(DYNAMIC_LIGHT_TARGET)
-                .set_color(Color32::WHITE)],
+            lights: vec![
+                *Light::default()
+                    .set_position(STATIC_LIGHT1_POSITION)
+                    .set_color(Color32::WHITE),
+                *Light::default()
+                    .set_target(DYNAMIC_LIGHT_TARGET)
+                    .set_color(Color32::WHITE),
+            ],
         }
     }
 }
@@ -82,7 +87,12 @@ impl GraphicDemo {
             .iter()
             .map(|light| {
                 (
-                    Vector::from(light.get_position() - position).norm(),
+                    Vector::new(
+                        light.get_position().x - position.x,
+                        light.get_position().y - position.y,
+                        light.get_position().z - position.z,
+                    )
+                    .norm(),
                     light.get_color(),
                     light.get_direction(),
                 )

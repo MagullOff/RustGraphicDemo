@@ -1,15 +1,33 @@
 use self::edge::Edge;
 use crate::polygon::*;
+use crate::utils::types::Point3;
 use crate::GraphicDemo;
 use egui::{Color32, ColorImage};
 use std::collections::HashMap;
 mod edge;
 mod paint_line;
 
+fn get_sorted_indeces(vertices: &Vec<Point3>) -> Vec<usize> {
+    let mut sort_vec = vertices
+        .iter()
+        .map(|v| *v)
+        .enumerate()
+        .collect::<Vec<(usize, Point3)>>();
+    sort_vec.sort_by(|(_, p1), (_, p2)| {
+        if p1.y < p2.y || (p1.y == p2.y && p1.x < p2.x) {
+            std::cmp::Ordering::Less
+        } else {
+            std::cmp::Ordering::Greater
+        }
+    });
+    sort_vec.iter().map(|elem| elem.0).collect()
+}
+
 impl GraphicDemo {
     pub fn fill_polygon(
         &self,
         polygon: &Polygon,
+        viewport_vertices: &Vec<Point3>,
         map: &mut ColorImage,
         zbuffor: &mut Vec<Vec<f32>>,
         color: Color32,
@@ -17,17 +35,10 @@ impl GraphicDemo {
         let mut aet: Vec<Edge> = vec![];
         let mut edge_collection: HashMap<(usize, usize), i32> = HashMap::new();
 
-        let ind = polygon.get_sorted_indeces();
-        let positions = polygon
-            .vertices
+        let ind = get_sorted_indeces(viewport_vertices);
+        let positions = viewport_vertices
             .iter()
-            .map(|v| {
-                [
-                    v.position.x as i32,
-                    v.position.y as i32,
-                    v.position.z as i32,
-                ]
-            })
+            .map(|p| [p.x as i32, p.y as i32, p.z as i32])
             .collect::<Vec<[i32; 3]>>();
         let ymin = positions[*ind.first().unwrap()][1];
         let ymax = positions[*ind.last().unwrap()][1];
@@ -74,7 +85,7 @@ impl GraphicDemo {
                 }
             }
             aet.sort_by(|a, b| a.min.partial_cmp(&b.min).unwrap());
-            self.paint_line(&aet, polygon, y, map, zbuffor, color);
+            self.paint_line(&aet, polygon, viewport_vertices, y, map, zbuffor, color);
             for i in 0..aet.len() {
                 aet[i].min += aet[i].inv;
             }

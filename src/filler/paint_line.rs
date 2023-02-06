@@ -1,24 +1,16 @@
 use super::edge::Edge;
+use crate::app::ShadingType;
 use crate::consts::AMBIENT_KA;
-use crate::polygon::{Polygon, Vertex};
+use crate::polygon::Polygon;
 use crate::utils::types::{Point2, Point3, Vector3};
 use crate::utils::vector::Vector;
 use crate::GraphicDemo;
 use egui::{Color32, ColorImage};
 
-fn get_barocenttric_coordinates(vertices: &[Vertex], point: Point2) -> (f32, f32, f32) {
-    let (x1, y1) = (
-        vertices[0].position[0] as i32,
-        vertices[0].position[1] as i32,
-    );
-    let (x2, y2) = (
-        vertices[1].position[0] as i32,
-        vertices[1].position[1] as i32,
-    );
-    let (x3, y3) = (
-        vertices[2].position[0] as i32,
-        vertices[2].position[1] as i32,
-    );
+fn get_barocenttric_coordinates(vertices: &[Point3], point: Point2) -> (f32, f32, f32) {
+    let (x1, y1) = (vertices[0][0] as i32, vertices[0][1] as i32);
+    let (x2, y2) = (vertices[1][0] as i32, vertices[1][1] as i32);
+    let (x3, y3) = (vertices[2][0] as i32, vertices[2][1] as i32);
     let w1 = ((y2 - y3) * (point.x - x3) + (x3 - x2) * (point.y - y3)) as f32
         / ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3)) as f32;
     let w2 = ((y3 - y1) * (point.x - x3) + (x1 - x3) * (point.y - y3)) as f32
@@ -54,7 +46,7 @@ impl GraphicDemo {
             .powf(self.light_parameters.m);
 
         let target_multiplier = match direction {
-            Some(vec) => Vector::cos(Vector::from(vec), r_vec).max(0.0),
+            Some(vec) => Vector::cos(Vector::from(vec).multiply(-1.0), r_vec).max(0.0),
             None => 1.0,
         };
 
@@ -96,6 +88,7 @@ impl GraphicDemo {
         &self,
         aet: &Vec<Edge>,
         polygon: &Polygon,
+        viewport_vertices: &[Point3],
         y: i32,
         map: &mut ColorImage,
         zbuffor: &mut Vec<Vec<f32>>,
@@ -105,54 +98,59 @@ impl GraphicDemo {
         while i <= (aet.len() as i8) - 2 {
             for x in (aet[i as usize].min as i32)..(aet[(i + 1) as usize].min as i32) {
                 let bacrocentric_coordinates =
-                    get_barocenttric_coordinates(&polygon.vertices, Point2::new(x, y));
+                    get_barocenttric_coordinates(viewport_vertices, Point2::new(x, y));
 
-                let z = get_interpolated_z(&polygon.vertices, bacrocentric_coordinates);
+                let z = get_interpolated_z(viewport_vertices, bacrocentric_coordinates);
                 let (w1, w2, w3) = bacrocentric_coordinates;
                 if z > zbuffor[x as usize][y as usize] {
                     return;
                 }
+                let rgb_res = match self.shading_type {
+                    ShadingType::Phong => {
+                        let normals = polygon
+                            .vertices
+                            .iter()
+                            .map(|v| Vector::from(v.normal).norm())
+                            .collect::<Vec<Vector>>();
+                        let true_normal = Vector::new(
+                            normals[0].x * w1 + normals[1].x * w2 + normals[2].x * w3,
+                            normals[0].y * w1 + normals[1].y * w2 + normals[2].y * w3,
+                            normals[0].z * w1 + normals[1].z * w2 + normals[2].z * w3,
+                        );
 
-                let normals = polygon
-                    .vertices
-                    .iter()
-                    .map(|v| Vector::from(v.normal).norm())
-                    .collect::<Vec<Vector>>();
-                let true_normal = Vector::new(
-                    normals[0].x * w1 + normals[1].x * w2 + normals[2].x * w3,
-                    normals[0].y * w1 + normals[1].y * w2 + normals[2].y * w3,
-                    normals[0].z * w1 + normals[1].z * w2 + normals[2].z * w3,
-                );
+                        let n_vec = true_normal.norm();
 
-                let n_vec = true_normal.norm();
-
-                let v_vec = self.get_view_vector(&Point3::new(x as f32, y as f32, z));
-                let rgb_vec = self
-                    .get_light_vector(&Point3::new(x as f32, y as f32, z))
-                    .into_iter()
-                    .map(|(vec, col, direction)| {
-                        let vec1 = vec.multiply(-1.0);
-                        let r_vec = n_vec.multiply(n_vec * vec1 * 2.0) - vec1;
-                        self.get_color(
-                            n_vec,
-                            vec1,
-                            v_vec,
-                            r_vec,
-                            (x as u32, y as u32),
-                            color,
-                            col,
-                            direction,
+                        let v_vec = self.get_view_vector(&polygon.vertices[0].position);
+                        let rgb_vec = self
+                            .get_light_vector(&polygon.vertices[0].position)
+                            .into_iter()
+                            .map(|(vec, col, direction)| {
+                                let vec1 = vec;
+                                let r_vec = n_vec.multiply(n_vec * vec1 * 2.0) - vec1;
+                                self.get_color(
+                                    n_vec,
+                                    vec1,
+                                    v_vec,
+                                    r_vec,
+                                    (x as u32, y as u32),
+                                    color,
+                                    col,
+                                    direction,
+                                )
+                            })
+                            .fold(
+                                Vector::new(AMBIENT_KA, AMBIENT_KA, AMBIENT_KA),
+                                |acc, val| acc + val,
+                            );
+                        Color32::from_rgb(
+                            (rgb_vec.x * 255.0) as u8,
+                            (rgb_vec.y * 255.0) as u8,
+                            (rgb_vec.z * 255.0) as u8,
                         )
-                    })
-                    .fold(
-                        Vector::new(AMBIENT_KA, AMBIENT_KA, AMBIENT_KA),
-                        |acc, val| acc + val,
-                    );
-                let rgb_res = Color32::from_rgb(
-                    (rgb_vec.x * 255.0) as u8,
-                    (rgb_vec.y * 255.0) as u8,
-                    (rgb_vec.z * 255.0) as u8,
-                );
+                    }
+                    ShadingType::Constant => todo!(),
+                    ShadingType::Gouraud => todo!(),
+                };
 
                 map[(x as usize, y as usize)] = rgb_res;
                 zbuffor[x as usize][y as usize] = z;
@@ -162,8 +160,6 @@ impl GraphicDemo {
     }
 }
 
-fn get_interpolated_z(vertices: &[Vertex], coordinates: (f32, f32, f32)) -> f32 {
-    vertices[0].position.z * coordinates.0
-        + vertices[1].position.z * coordinates.1
-        + vertices[2].position.z * coordinates.2
+fn get_interpolated_z(vertices: &[Point3], coordinates: (f32, f32, f32)) -> f32 {
+    vertices[0].z * coordinates.0 + vertices[1].z * coordinates.1 + vertices[2].z * coordinates.2
 }

@@ -1,8 +1,7 @@
-use super::{FillingType, GraphicDemo, LightParameters};
+use super::{GraphicDemo, LightParameters, ShadingType};
 use crate::camera::CameraKind;
 use crate::consts::*;
 use crate::traits::movable::Movable;
-use crate::utils::types::*;
 use egui::*;
 impl eframe::App for GraphicDemo {
     fn save(&mut self, _storage: &mut dyn eframe::Storage) {}
@@ -59,7 +58,7 @@ impl GraphicDemo {
     }
     fn options_ui(&mut self, ui: &mut Ui) {
         let Self {
-            filling_type,
+            shading_type,
             fov,
             light_parameters,
             animation,
@@ -77,9 +76,9 @@ impl GraphicDemo {
         ui.radio_value(&mut camera.kind, CameraKind::Following, "Following");
         ui.separator();
         ui.label("Chose the filling type");
-        ui.radio_value(&mut *filling_type, FillingType::Constant, "Constant");
-        ui.radio_value(&mut *filling_type, FillingType::Gouraud, "Gouraud");
-        ui.radio_value(&mut *filling_type, FillingType::Phong, "Phong");
+        ui.radio_value(&mut *shading_type, ShadingType::Constant, "Constant");
+        ui.radio_value(&mut *shading_type, ShadingType::Gouraud, "Gouraud");
+        ui.radio_value(&mut *shading_type, ShadingType::Phong, "Phong");
         ui.separator();
         ui.label("Light parameters");
         ui.add(egui::Slider::new(m, 1f32..=MAX_M).text("m"));

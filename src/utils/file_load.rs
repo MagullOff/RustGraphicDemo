@@ -81,9 +81,7 @@ pub fn load_polygons(file_path: &str) -> Vec<Polygon> {
                             }
                         })
                         .collect();
-                    Polygon {
-                        vertices: new_vertices,
-                    }
+                    Polygon::new(new_vertices)
                 })
                 .collect::<Vec<Polygon>>()
         }
