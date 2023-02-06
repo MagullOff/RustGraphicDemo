@@ -67,10 +67,10 @@ impl Default for GraphicDemo {
             camera: Camera::default(),
             lights: vec![
                 *Light::default()
-                    .set_position(STATIC_LIGHT1_POSITION)
+                    .set_target(DYNAMIC_LIGHT_TARGET)
                     .set_color(Color32::WHITE),
                 *Light::default()
-                    .set_target(DYNAMIC_LIGHT_TARGET)
+                    .set_position(STATIC_LIGHT1_POSITION)
                     .set_color(Color32::WHITE),
             ],
         }

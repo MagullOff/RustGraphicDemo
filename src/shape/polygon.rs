@@ -11,6 +11,11 @@ impl Polygon {
         self.vertices
             .iter_mut()
             .for_each(|v| v.move_by_vector(vector));
+        self.center = Point3::new(
+            vector.x + self.center.x,
+            vector.y + self.center.y,
+            vector.z + self.center.z,
+        );
     }
 
     pub fn new(vertices: Vec<Vertex>) -> Self {
