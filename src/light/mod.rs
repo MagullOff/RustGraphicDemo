@@ -6,7 +6,7 @@ mod traits;
 
 #[derive(Clone, Copy)]
 pub struct Light {
-    position: Point3,
+    pub position: Point3,
     color: Color32,
     direction: Option<Vector3>,
 }

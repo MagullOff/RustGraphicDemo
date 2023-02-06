@@ -52,21 +52,21 @@ impl Movable for Camera {
         match self.kind {
             CameraKind::Following => {
                 self.target.x = SHAPE_ORBIT_RADIUS * angle.sin();
-                self.target.y = SHAPE_ORBIT_RADIUS * angle.cos();
+                self.target.z = SHAPE_ORBIT_RADIUS * angle.cos();
                 self.position = FOLLOWING_CAMERA_POSITION;
                 self.calculate_matrix();
             }
             CameraKind::Moving => {
                 self.target = MOVING_CAMERA_TARGET;
                 self.position.x = CAMERA_ORBIT_RADIUS * angle.sin();
-                self.position.y = CAMERA_ORBIT_RADIUS * angle.cos();
-                self.position.z = MOVING_CAMERA_Z;
+                self.position.y = MOVING_CAMERA_Y;
+                self.position.z = CAMERA_ORBIT_RADIUS * angle.cos();
                 self.calculate_matrix();
             }
             CameraKind::Static => {
-                // self.position = STATIC_CAMERA_POSITION;
-                // self.target = STATIC_CAMERA_TARGET;
-                // self.calculate_matrix();
+                self.position = STATIC_CAMERA_POSITION;
+                self.target = STATIC_CAMERA_TARGET;
+                self.calculate_matrix();
             }
         }
     }

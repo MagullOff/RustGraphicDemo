@@ -47,13 +47,13 @@ impl Default for GraphicDemo {
             shapes: vec![
                 Shape::new(
                     load_polygons("assets/sphere.obj"),
-                    Point3::new(0.0, -150.0, 0.0),
+                    Point3::new(-150.0, 0.0, 0.0),
                     ShapeMovementType::Static,
                     Color32::WHITE,
                 ),
                 Shape::new(
                     load_polygons("assets/sphere.obj"),
-                    Point3::new(0.0, 150.0, 0.0),
+                    Point3::new(150.0, 0.0, 0.0),
                     ShapeMovementType::Static,
                     Color32::WHITE,
                 ),
@@ -65,14 +65,9 @@ impl Default for GraphicDemo {
                 ),
             ],
             camera: Camera::default(),
-            lights: vec![
-                *Light::default()
-                    .set_position(STATIC_LIGHT1_POSITION)
-                    .set_color(Color32::WHITE),
-                *Light::default()
-                    .set_target(DYNAMIC_LIGHT_TARGET)
-                    .set_color(Color32::RED),
-            ],
+            lights: vec![*Light::default()
+                .set_target(DYNAMIC_LIGHT_TARGET)
+                .set_color(Color32::WHITE)],
         }
     }
 }

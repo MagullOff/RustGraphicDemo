@@ -131,10 +131,11 @@ impl GraphicDemo {
                     .get_light_vector(&Point3::new(x as f32, y as f32, z))
                     .into_iter()
                     .map(|(vec, col, direction)| {
-                        let r_vec = n_vec.multiply(n_vec * vec * 2.0) - vec;
+                        let vec1 = vec.multiply(-1.0);
+                        let r_vec = n_vec.multiply(n_vec * vec1 * 2.0) - vec1;
                         self.get_color(
                             n_vec,
-                            vec,
+                            vec1,
                             v_vec,
                             r_vec,
                             (x as u32, y as u32),
@@ -143,7 +144,10 @@ impl GraphicDemo {
                             direction,
                         )
                     })
-                    .fold(Vector::new(0.0, 0.0, 0.0), |acc, val| acc + val);
+                    .fold(
+                        Vector::new(AMBIENT_KA, AMBIENT_KA, AMBIENT_KA),
+                        |acc, val| acc + val,
+                    );
                 let rgb_res = Color32::from_rgb(
                     (rgb_vec.x * 255.0) as u8,
                     (rgb_vec.y * 255.0) as u8,

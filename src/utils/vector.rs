@@ -41,7 +41,7 @@ impl Vector {
     pub fn cross(&self, other: Vector) -> Vector {
         Vector::new(
             self.y * other.z - self.z * other.y,
-            self.z * other.x - self.x * other.z,
+            (self.z * other.x - self.x * other.z) * (-1.0),
             self.x * other.y - self.y * other.x,
         )
     }
@@ -71,7 +71,7 @@ impl Sub for Vector {
 impl Mul for Vector {
     type Output = f32;
     fn mul(self, other: Self) -> f32 {
-        self.x * other.x + self.y * other.y + self.z + other.z
+        self.x * other.x + self.y * other.y + self.z * other.z
     }
 }
 
