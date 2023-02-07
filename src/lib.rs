@@ -2,7 +2,7 @@
 
 pub mod consts {
     use nalgebra::{Point3, Vector3};
-    pub const IMAGE_SIZE: usize = 900;
+    pub const IMAGE_SIZE: usize = 800;
     pub const SHAPE_SIZE: u32 = 200;
     pub const MAX_KD: f32 = 1.0;
     pub const MAX_KS: f32 = 1.0;
@@ -24,7 +24,8 @@ pub mod consts {
     pub const CAMERA_NEAR: f32 = 1.0;
     pub const CAMERA_FAR: f32 = 4000.0;
 
-    pub const STATIC_LIGHT1_POSITION: Point3<f32> = Point3::new(0.0, 0.0, 0.0);
+    pub const STATIC_LIGHT1_POSITION: Point3<f32> = Point3::new(200.0, -500.0, 200.0);
+    pub const STATIC_LIGHT2_POSITION: Point3<f32> = Point3::new(-200.0, 500.0, -200.0);
     pub const DYNAMIC_LIGHT_TARGET: Point3<f32> = Point3::new(0.0, 0.0, 0.0);
 
     pub const LIGHT_ORBIT_RADIUS: f32 = 650.0;

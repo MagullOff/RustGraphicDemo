@@ -1,5 +1,5 @@
 pub mod polygon;
-use crate::utils::types::*;
+use crate::utils::{get_angle, get_offset, types::*};
 use egui::Color32;
 use polygon::Polygon;
 
@@ -19,6 +19,7 @@ pub struct Shape {
     pub movement_type: ShapeMovementType,
     pub matrix: Matrix4,
     pub color: Color32,
+    pub offset: f32,
 }
 
 impl Movable for Shape {
@@ -26,15 +27,17 @@ impl Movable for Shape {
         match self.movement_type {
             ShapeMovementType::Static => {}
             ShapeMovementType::Orbital => {
-                let angle = (tick * 2.5).rem_euclid(2.0 * std::f32::consts::PI) as f32;
+                let angle = get_angle(tick);
                 self.position[0] = SHAPE_ORBIT_RADIUS * angle.sin();
                 self.position[2] = SHAPE_ORBIT_RADIUS * angle.cos();
                 let mut new_polygons = self.polygons.clone();
+                let mut position = self.position;
+                position.x += self.offset;
                 new_polygons
                     .iter_mut()
-                    .for_each(|p| p.move_vertices(self.position));
+                    .for_each(|p| p.move_vertices(position));
                 self.transformed_polygons = new_polygons;
-                let _angle = (self.position[0] / self.position[2]).atan();
+                // let angle = (self.position[0] / self.position[2]).atan();
                 // self.matrix = Matrix4::new_rotation_wrt_point(
                 //     Vector3::from_vec(vec![0.0, angle, 0.0]),
                 //     Point3::new(
@@ -43,6 +46,7 @@ impl Movable for Shape {
                 //         self.position[2] as f32,
                 //     ),
                 // )
+                self.offset *= -1.0;
             }
         }
     }
@@ -67,6 +71,7 @@ impl Shape {
             movement_type,
             matrix: Matrix4::new_rotation(Vector3::zeros()),
             color,
+            offset: 10.0,
         }
     }
 }

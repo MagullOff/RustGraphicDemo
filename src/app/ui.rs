@@ -63,6 +63,8 @@ impl GraphicDemo {
             light_parameters,
             animation,
             camera,
+            fog,
+            fog_color,
             ..
         } = self;
         let LightParameters { m, kd, ks } = light_parameters;
@@ -84,9 +86,8 @@ impl GraphicDemo {
         ui.add(egui::Slider::new(m, 1f32..=MAX_M).text("m"));
         ui.add(egui::Slider::new(kd, 0.001..=MAX_KD).text("kd"));
         ui.add(egui::Slider::new(ks, 0.001..=MAX_KS).text("ks"));
-        ui.label("Target position");
-        ui.add(egui::Slider::new(&mut self.lights[0].position[0], -1000.0..=1000.0).text("x"));
-        ui.add(egui::Slider::new(&mut self.lights[0].position[1], -1000.0..=1000.0).text("y"));
-        ui.add(egui::Slider::new(&mut self.lights[0].position[2], -1000.0..=1000.0).text("z"));
+        ui.label("Fog parameters");
+        ui.checkbox(&mut *fog, "Enable fog");
+        ui.color_edit_button_rgb(&mut *fog_color);
     }
 }

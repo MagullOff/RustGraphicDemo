@@ -1,5 +1,6 @@
 use crate::consts::*;
 use crate::traits::movable::Movable;
+use crate::utils::get_angle;
 use crate::utils::types::{Matrix4, Point3};
 
 #[derive(PartialEq, Eq, Debug)]
@@ -48,7 +49,7 @@ impl Default for Camera {
 
 impl Movable for Camera {
     fn update(&mut self, tick: f32) {
-        let angle = (tick * 2.5).rem_euclid(2.0 * std::f32::consts::PI) as f32;
+        let angle = get_angle(tick);
         match self.kind {
             CameraKind::Following => {
                 self.target.x = SHAPE_ORBIT_RADIUS * angle.sin();

@@ -37,7 +37,7 @@ fn calculate_normalized_cords(p: Vector4) -> Point3 {
 }
 
 impl GraphicDemo {
-    fn draw_lines(
+    fn draw_polygon(
         &self,
         view_matrix: Matrix4,
         rotation_matrix: Matrix4,
@@ -78,7 +78,7 @@ impl GraphicDemo {
 
         for shape in &self.shapes {
             for polygon in &shape.transformed_polygons {
-                self.draw_lines(
+                self.draw_polygon(
                     self.camera.matrix,
                     shape.matrix,
                     polygon,
@@ -87,6 +87,10 @@ impl GraphicDemo {
                     shape.color,
                 );
             }
+        }
+
+        if self.fog {
+            self.apply_fog(zbuffor, &mut map);
         }
 
         for x in 0..IMAGE_SIZE {
