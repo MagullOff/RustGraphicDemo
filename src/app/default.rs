@@ -16,23 +16,50 @@ impl Default for GraphicDemo {
             shapes: vec![
                 Shape::new(
                     load_polygons("assets/sphere.obj"),
-                    Point3::new(0.0, 0.0, 0.0),
+                    Point3::new(-200.0, 0.0, 0.0),
                     ShapeMovementType::Static,
-                    Color32::WHITE,
+                    Color32::YELLOW,
                 ),
                 Shape::new(
-                    load_polygons("assets/cube.obj"),
+                    load_polygons("assets/sphere.obj"),
+                    Point3::new(0.0, 200.0, 0.0),
+                    ShapeMovementType::Static,
+                    Color32::RED,
+                ),
+                Shape::new(
+                    load_polygons("assets/sphere.obj"),
+                    Point3::new(0.0, -200.0, 0.0),
+                    ShapeMovementType::Static,
+                    Color32::GREEN,
+                ),
+                Shape::new(
+                    load_polygons("assets/sphere.obj"),
+                    Point3::new(200.0, 0.0, 0.0),
+                    ShapeMovementType::Static,
+                    Color32::BLUE,
+                ),
+                Shape::new(
+                    load_polygons("assets/rat.obj"),
                     Point3::new(0.0, 0.0, 0.0),
                     ShapeMovementType::Orbital,
-                    Color32::WHITE,
+                    Color32::DARK_GREEN,
                 ),
             ],
             camera: Camera::default(),
-            lights: vec![*Light::default()
-                .set_position(STATIC_LIGHT1_POSITION)
-                .set_color(Color32::LIGHT_YELLOW)],
+            lights: vec![
+                *Light::default()
+                    .set_position(STATIC_LIGHT2_POSITION)
+                    .set_color(Color32::WHITE),
+                *Light::default()
+                    .set_position(STATIC_LIGHT1_POSITION)
+                    .set_color(Color32::WHITE),
+                *Light::default()
+                    .set_target(DYNAMIC_LIGHT_TARGET)
+                    .set_color(Color32::WHITE),
+            ],
             fog: false,
-            fog_color: [1.0, 1.0, 1.0],
+            fog_color: [0.6, 0.6, 0.6],
+            light_force: 1.0,
         }
     }
 }

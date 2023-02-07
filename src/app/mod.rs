@@ -15,6 +15,7 @@ pub struct GraphicDemo {
     animation: bool,
     fog: bool,
     fog_color: [f32; 3],
+    light_force: f32,
 }
 
 pub struct LightParameters {

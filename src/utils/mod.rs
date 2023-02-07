@@ -6,10 +6,6 @@ pub fn get_angle(tick: f32) -> f32 {
     (tick * 2.5).rem_euclid(2.0 * std::f32::consts::PI) as f32
 }
 
-pub fn get_offset(tick: f32) -> f32 {
-    ((tick * 100.0).rem_euclid(2.0) as f32) * 10.0
-}
-
 pub mod types {
     pub type Point3 = nalgebra::Point3<f32>;
     pub type Point2 = nalgebra::Point2<i32>;

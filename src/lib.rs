@@ -11,20 +11,20 @@ pub mod consts {
     pub const SHAPE_ORBIT_RADIUS: f32 = 800.0;
     pub const CAMERA_ORBIT_RADIUS: f32 = 400.0 + SHAPE_ORBIT_RADIUS;
 
-    pub const FOLLOWING_CAMERA_POSITION: Point3<f32> = Point3::new(-900.0, -900.0, -1000.0);
+    pub const FOLLOWING_CAMERA_POSITION: Point3<f32> = Point3::new(-900.0, 900.0, -1000.0);
 
     pub const MOVING_CAMERA_TARGET: Point3<f32> = Point3::new(0.0, 0.0, 0.0);
-    pub const MOVING_CAMERA_Y: f32 = -500.0;
+    pub const MOVING_CAMERA_Y: f32 = 500.0;
 
-    pub const STATIC_CAMERA_POSITION: Point3<f32> = Point3::new(900.0, -500.0, 500.0);
+    pub const STATIC_CAMERA_POSITION: Point3<f32> = Point3::new(900.0, 500.0, 500.0);
     pub const STATIC_CAMERA_TARGET: Point3<f32> = Point3::new(0.0, 0.0, 0.0);
 
-    pub const UP_VECTOR: Vector3<f32> = Vector3::new(0.0, 1.0, 0.0);
+    pub const UP_VECTOR: Vector3<f32> = Vector3::new(0.0, -1.0, 0.0);
 
     pub const CAMERA_NEAR: f32 = 1.0;
     pub const CAMERA_FAR: f32 = 4000.0;
 
-    pub const STATIC_LIGHT1_POSITION: Point3<f32> = Point3::new(0.0, 0.0, 0.0);
+    pub const STATIC_LIGHT1_POSITION: Point3<f32> = Point3::new(200.0, -500.0, -200.0);
     pub const STATIC_LIGHT2_POSITION: Point3<f32> = Point3::new(-200.0, 500.0, -200.0);
     pub const DYNAMIC_LIGHT_TARGET: Point3<f32> = Point3::new(0.0, 0.0, 0.0);
 

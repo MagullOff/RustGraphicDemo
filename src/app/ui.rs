@@ -65,6 +65,7 @@ impl GraphicDemo {
             camera,
             fog,
             fog_color,
+            light_force,
             ..
         } = self;
         let LightParameters { m, kd, ks } = light_parameters;
@@ -86,8 +87,24 @@ impl GraphicDemo {
         ui.add(egui::Slider::new(m, 1f32..=MAX_M).text("m"));
         ui.add(egui::Slider::new(kd, 0.001..=MAX_KD).text("kd"));
         ui.add(egui::Slider::new(ks, 0.001..=MAX_KS).text("ks"));
+        ui.separator();
         ui.label("Fog parameters");
         ui.checkbox(&mut *fog, "Enable fog");
         ui.color_edit_button_rgb(&mut *fog_color);
+        ui.separator();
+        ui.label("Night and day");
+        ui.add(egui::Slider::new(light_force, 0.001..=1.0).text("Light force"));
+
+        let current_color = Color32::WHITE;
+        self.lights[0].set_color(Color32::from_rgb(
+            (current_color.r() as f32 * self.light_force) as u8,
+            (current_color.g() as f32 * self.light_force) as u8,
+            (current_color.b() as f32 * self.light_force) as u8,
+        ));
+        self.lights[1].set_color(Color32::from_rgb(
+            (current_color.r() as f32 * self.light_force) as u8,
+            (current_color.g() as f32 * self.light_force) as u8,
+            (current_color.b() as f32 * self.light_force) as u8,
+        ));
     }
 }
