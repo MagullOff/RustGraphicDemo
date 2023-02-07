@@ -24,7 +24,7 @@ pub mod consts {
     pub const CAMERA_NEAR: f32 = 1.0;
     pub const CAMERA_FAR: f32 = 4000.0;
 
-    pub const STATIC_LIGHT1_POSITION: Point3<f32> = Point3::new(200.0, -500.0, 200.0);
+    pub const STATIC_LIGHT1_POSITION: Point3<f32> = Point3::new(0.0, 0.0, 0.0);
     pub const STATIC_LIGHT2_POSITION: Point3<f32> = Point3::new(-200.0, 500.0, -200.0);
     pub const DYNAMIC_LIGHT_TARGET: Point3<f32> = Point3::new(0.0, 0.0, 0.0);
 

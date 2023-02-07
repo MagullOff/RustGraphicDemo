@@ -1,6 +1,5 @@
 use self::edge::Edge;
-use crate::polygon::*;
-use crate::utils::types::Point3;
+use crate::utils::types::*;
 use crate::GraphicDemo;
 use egui::{Color32, ColorImage};
 use std::collections::HashMap;
@@ -26,8 +25,9 @@ fn get_sorted_indeces(vertices: &Vec<Point3>) -> Vec<usize> {
 impl GraphicDemo {
     pub fn fill_polygon(
         &self,
-        polygon: &Polygon,
         viewport_vertices: &Vec<Point3>,
+        rotated_vertices: &Vec<Point3>,
+        normal_vectors: &Vec<Vector3>,
         map: &mut ColorImage,
         zbuffor: &mut Vec<Vec<f32>>,
         color: Color32,
@@ -85,7 +85,16 @@ impl GraphicDemo {
                 }
             }
             aet.sort_by(|a, b| a.min.partial_cmp(&b.min).unwrap());
-            self.paint_line(&aet, polygon, viewport_vertices, y, map, zbuffor, color);
+            self.paint_line(
+                &aet,
+                viewport_vertices,
+                rotated_vertices,
+                normal_vectors,
+                y,
+                map,
+                zbuffor,
+                color,
+            );
             for i in 0..aet.len() {
                 aet[i].min += aet[i].inv;
             }

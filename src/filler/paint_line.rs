@@ -8,6 +8,17 @@ use crate::GraphicDemo;
 use egui::{Color32, ColorImage};
 use itertools::Itertools;
 
+fn get_center(vertices: &[Point3]) -> Point3 {
+    let length = vertices.len() as f32;
+    let (x, y, z) = &vertices
+        .iter()
+        .map(|v| (v.x, v.y, v.z))
+        .fold((0f32, 0f32, 0f32), |acc, val| {
+            (acc.0 + val.0, acc.1 + val.1, acc.2 + val.2)
+        });
+    Point3::new(x / length, y / length, z / length)
+}
+
 fn get_barocenttric_coordinates(vertices: &[Point3], point: Point2) -> (f32, f32, f32) {
     let (x1, y1) = (vertices[0][0] as i32, vertices[0][1] as i32);
     let (x2, y2) = (vertices[1][0] as i32, vertices[1][1] as i32);
@@ -35,26 +46,25 @@ enum ColorInterpolation {
 }
 
 impl GraphicDemo {
-    fn get_color_at(&self, polygon: &Polygon, point: Point3, color: Color32) -> Vector {
-        let bacrocentric_coordinates = get_barocenttric_coordinates(
-            &polygon.vertices.iter().map(|v| v.position).collect_vec(),
-            Point2::new(point.x as i32, point.y as i32),
-        );
+    fn get_color_at(
+        &self,
+        vertices: &[Point3],
+        point: Point3,
+        normals: &[Vector3],
+        color: Color32,
+    ) -> Vector {
+        let bacrocentric_coordinates =
+            get_barocenttric_coordinates(&vertices, Point2::new(point.x as i32, point.y as i32));
 
         let (w1, w2, w3) = bacrocentric_coordinates;
-        let normals = polygon
-            .vertices
-            .iter()
-            .map(|v| Vector::from(v.normal).norm())
-            .collect::<Vec<Vector>>();
         let true_normal = Vector::new(
             normals[0].x * w1 + normals[1].x * w2 + normals[2].x * w3,
             normals[0].y * w1 + normals[1].y * w2 + normals[2].y * w3,
             normals[0].z * w1 + normals[1].z * w2 + normals[2].z * w3,
         );
         let n_vec = true_normal.norm();
-        let v_vec = self.get_view_vector(&polygon.center);
-        self.get_light_vector(&polygon.center)
+        let v_vec = self.get_view_vector(&point);
+        self.get_light_vector(&point)
             .into_iter()
             .map(|(vec, col, direction)| {
                 let vec1 = vec;
@@ -143,8 +153,9 @@ impl GraphicDemo {
     pub fn paint_line(
         &self,
         aet: &Vec<Edge>,
-        polygon: &Polygon,
         viewport_vertices: &[Point3],
+        rotated_vertices: &[Point3],
+        normal_vectors: &[Vector3],
         y: i32,
         map: &mut ColorImage,
         zbuffor: &mut Vec<Vec<f32>>,
@@ -152,15 +163,16 @@ impl GraphicDemo {
     ) {
         let polygon_color = match self.shading_type {
             ShadingType::Constant => ColorInterpolation::Constant(to_color(self.get_color_at(
-                polygon,
-                polygon.center,
+                rotated_vertices,
+                get_center(rotated_vertices),
+                normal_vectors,
                 color,
             ))),
             ShadingType::Phong => ColorInterpolation::Phong,
             ShadingType::Gouraud => ColorInterpolation::Gouraud([
-                self.get_color_at(polygon, polygon.vertices[0].position, color),
-                self.get_color_at(polygon, polygon.vertices[1].position, color),
-                self.get_color_at(polygon, polygon.vertices[2].position, color),
+                self.get_color_at(rotated_vertices, rotated_vertices[0], normal_vectors, color),
+                self.get_color_at(rotated_vertices, rotated_vertices[1], normal_vectors, color),
+                self.get_color_at(rotated_vertices, rotated_vertices[2], normal_vectors, color),
             ]),
         };
         for i in (0..=((aet.len() as i8) - 2)).step_by(2) {
@@ -176,25 +188,30 @@ impl GraphicDemo {
                     ColorInterpolation::Constant(polygon_color) => polygon_color,
                     ColorInterpolation::Phong => {
                         let (w1, w2, w3) = get_barocenttric_coordinates(
-                            &polygon.vertices.iter().map(|v| v.position).collect_vec(),
+                            rotated_vertices,
                             Point2::new(x as i32, y as i32),
                         );
                         let position = Point3::new(
-                            polygon.vertices[0].position.x * w1
-                                + polygon.vertices[1].position.x * w2
-                                + polygon.vertices[2].position.x * w3,
-                            polygon.vertices[0].position.y * w1
-                                + polygon.vertices[1].position.y * w2
-                                + polygon.vertices[2].position.y * w3,
-                            polygon.vertices[0].position.z * w1
-                                + polygon.vertices[1].position.z * w2
-                                + polygon.vertices[2].position.z * w3,
+                            rotated_vertices[0].x * w1
+                                + rotated_vertices[1].x * w2
+                                + rotated_vertices[2].x * w3,
+                            rotated_vertices[0].y * w1
+                                + rotated_vertices[1].y * w2
+                                + rotated_vertices[2].y * w3,
+                            rotated_vertices[0].z * w1
+                                + rotated_vertices[1].z * w2
+                                + rotated_vertices[2].z * w3,
                         );
-                        to_color(self.get_color_at(polygon, position, color))
+                        to_color(self.get_color_at(
+                            rotated_vertices,
+                            position,
+                            normal_vectors,
+                            color,
+                        ))
                     }
                     ColorInterpolation::Gouraud(color_vec) => {
                         let (w1, w2, w3) = get_barocenttric_coordinates(
-                            &polygon.vertices.iter().map(|v| v.position).collect_vec(),
+                            rotated_vertices,
                             Point2::new(x as i32, y as i32),
                         );
                         to_color(Vector::new(

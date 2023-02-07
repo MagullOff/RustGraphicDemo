@@ -1,8 +1,7 @@
 use super::GraphicDemo;
-use crate::polygon::Polygon;
-use crate::utils::bresenham::draw_bresenham_line;
+use crate::consts::*;
+use crate::polygon::{Polygon, Vertex};
 use crate::utils::types::{Matrix4, Point3, Vector4};
-use crate::{consts::*, polygon::Vertex};
 use egui::*;
 use itertools::Itertools;
 
@@ -21,8 +20,12 @@ fn calculate_clip_cords(
     view_matrix: Matrix4,
     rotation_matrix: Matrix4,
     p: Vector4,
-) -> Vector4 {
-    perspective_matrix * (view_matrix * (rotation_matrix * p))
+) -> (Vector4, Vector4) {
+    let rotated_points = rotation_matrix * p;
+    (
+        perspective_matrix * (view_matrix * rotated_points),
+        rotated_points,
+    )
 }
 
 fn check_if_in_range(point1: Vector4, point2: Vector4) -> bool {
@@ -55,15 +58,34 @@ impl GraphicDemo {
             .iter()
             .map(|v| calculate_point_vector(v.position))
             .map(|p| calculate_clip_cords(perspective_matrix, view_matrix, rotation_matrix, p))
-            .map(|clip_cords| (calculate_normalized_cords(clip_cords), clip_cords));
+            .map(|(clip_cords, rotated_vertices)| {
+                (
+                    calculate_normalized_cords(clip_cords),
+                    clip_cords,
+                    rotated_vertices,
+                )
+            });
 
-        let viewport_vertices = normalized_vertices.clone().map(|(p, _)| p).collect_vec();
+        let viewport_vertices = normalized_vertices.clone().map(|(p, _, _)| p).collect_vec();
         let is_not_clipped = normalized_vertices
+            .clone()
             .combinations(2)
             .map(|pair| check_if_in_range(pair[0].1, pair[1].1))
             .all(|cond| cond);
         if is_not_clipped {
-            self.fill_polygon(&polygon, &viewport_vertices, map, zbuffor, color);
+            let normal_vertices = polygon.vertices.iter().map(|v| v.normal).collect_vec();
+            let rotated_vertices = normalized_vertices
+                .clone()
+                .map(|(_, _, x)| Point3::new(x[0], x[1], x[2]))
+                .collect_vec();
+            self.fill_polygon(
+                &viewport_vertices,
+                &rotated_vertices,
+                &normal_vertices,
+                map,
+                zbuffor,
+                color,
+            );
         }
     }
 

@@ -15,30 +15,22 @@ impl Default for GraphicDemo {
             animation: true,
             shapes: vec![
                 Shape::new(
-                    load_polygons("assets/amogus.obj"),
+                    load_polygons("assets/sphere.obj"),
                     Point3::new(0.0, 0.0, 0.0),
                     ShapeMovementType::Static,
                     Color32::WHITE,
                 ),
                 Shape::new(
-                    load_polygons("assets/sphere.obj"),
+                    load_polygons("assets/cube.obj"),
                     Point3::new(0.0, 0.0, 0.0),
                     ShapeMovementType::Orbital,
                     Color32::WHITE,
                 ),
             ],
             camera: Camera::default(),
-            lights: vec![
-                *Light::default()
-                    .set_target(DYNAMIC_LIGHT_TARGET)
-                    .set_color(Color32::WHITE),
-                *Light::default()
-                    .set_position(STATIC_LIGHT1_POSITION)
-                    .set_color(Color32::LIGHT_YELLOW),
-                *Light::default()
-                    .set_position(STATIC_LIGHT2_POSITION)
-                    .set_color(Color32::LIGHT_RED),
-            ],
+            lights: vec![*Light::default()
+                .set_position(STATIC_LIGHT1_POSITION)
+                .set_color(Color32::LIGHT_YELLOW)],
             fog: false,
             fog_color: [1.0, 1.0, 1.0],
         }
