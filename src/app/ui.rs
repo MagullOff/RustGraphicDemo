@@ -94,6 +94,13 @@ impl GraphicDemo {
         ui.separator();
         ui.label("Night and day");
         ui.add(egui::Slider::new(light_force, 0.001..=1.0).text("Light force"));
+        ui.separator();
+        ui.label("moving options");
+        ui.checkbox(&mut self.shapes[4].vibration, "Enable vibration");
+        ui.add(
+            egui::Slider::new(&mut self.lights[2].rotation_angle, -1.0..=1.0)
+                .text("Light rotation"),
+        );
 
         let current_color = Color32::WHITE;
         self.lights[0].set_color(Color32::from_rgb(

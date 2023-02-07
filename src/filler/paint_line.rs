@@ -1,12 +1,10 @@
 use super::edge::Edge;
 use crate::app::ShadingType;
 use crate::consts::AMBIENT_KA;
-use crate::polygon::Polygon;
 use crate::utils::types::{Point2, Point3, Vector3};
 use crate::utils::vector::Vector;
 use crate::GraphicDemo;
 use egui::{Color32, ColorImage};
-use itertools::Itertools;
 
 fn get_center(vertices: &[Point3]) -> Point3 {
     let length = vertices.len() as f32;
@@ -188,7 +186,7 @@ impl GraphicDemo {
                     ColorInterpolation::Constant(polygon_color) => polygon_color,
                     ColorInterpolation::Phong => {
                         let (w1, w2, w3) = get_barocenttric_coordinates(
-                            rotated_vertices,
+                            viewport_vertices,
                             Point2::new(x as i32, y as i32),
                         );
                         let position = Point3::new(
@@ -211,7 +209,7 @@ impl GraphicDemo {
                     }
                     ColorInterpolation::Gouraud(color_vec) => {
                         let (w1, w2, w3) = get_barocenttric_coordinates(
-                            rotated_vertices,
+                            viewport_vertices,
                             Point2::new(x as i32, y as i32),
                         );
                         to_color(Vector::new(

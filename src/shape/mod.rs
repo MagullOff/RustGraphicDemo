@@ -20,6 +20,7 @@ pub struct Shape {
     pub matrix: Matrix4,
     pub color: Color32,
     pub offset: f32,
+    pub vibration: bool,
 }
 
 impl Movable for Shape {
@@ -32,8 +33,7 @@ impl Movable for Shape {
                 self.position[2] = SHAPE_ORBIT_RADIUS * angle.cos();
                 let mut new_polygons = self.polygons.clone();
                 let mut position = self.position;
-                let vibration = true;
-                if vibration {
+                if self.vibration {
                     position.x += self.offset;
                 }
                 new_polygons
@@ -74,6 +74,7 @@ impl Shape {
             matrix: Matrix4::new_rotation_wrt_point(Vector3::zeros(), position),
             color,
             offset: 10.0,
+            vibration: false,
         }
     }
 }

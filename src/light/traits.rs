@@ -11,7 +11,8 @@ impl Movable for Light {
                 self.position[0] = LIGHT_ORBIT_RADIUS * angle.sin();
                 self.position[1] = 0.0;
                 self.position[2] = LIGHT_ORBIT_RADIUS * angle.cos();
-                self.set_target(Point3::new(0.0, 0.0, 0.0));
+                let a = LIGHT_ORBIT_RADIUS * self.rotation_angle.tan();
+                self.set_target(Point3::new(angle.cos() * a, 0.0, angle.sin() * a));
             }
             None => {}
         }
