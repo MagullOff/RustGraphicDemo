@@ -28,9 +28,14 @@ impl Default for GraphicDemo {
                 ),
             ],
             camera: Camera::default(),
-            lights: vec![*Light::default()
-                .set_position(STATIC_LIGHT1_POSITION)
-                .set_color(Color32::LIGHT_YELLOW)],
+            lights: vec![
+                *Light::default()
+                    .set_position(STATIC_LIGHT1_POSITION)
+                    .set_color(Color32::WHITE),
+                *Light::default()
+                    .set_target(DYNAMIC_LIGHT_TARGET)
+                    .set_color(Color32::RED),
+            ],
             fog: false,
             fog_color: [1.0, 1.0, 1.0],
         }
