@@ -8,20 +8,19 @@ impl eframe::App for GraphicDemo {
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
-            if self.animation {
-                use chrono::Timelike;
-                let time = chrono::Local::now().time();
-                let sec_since_midnight =
-                    time.num_seconds_from_midnight() as f64 + 1e-9 * (time.nanosecond() as f64);
-                for shape in &mut self.shapes {
-                    shape.update(sec_since_midnight as f32);
-                }
-                self.camera.update(sec_since_midnight as f32);
-                self.lights
-                    .iter_mut()
-                    .for_each(|l| l.update(sec_since_midnight as f32));
-                ui.ctx().request_repaint();
+            use chrono::Timelike;
+            let time = chrono::Local::now().time();
+            let sec_since_midnight =
+                time.num_seconds_from_midnight() as f64 + 1e-9 * (time.nanosecond() as f64);
+            for shape in &mut self.shapes {
+                shape.update(sec_since_midnight as f32, self.animation);
             }
+            self.camera
+                .update(sec_since_midnight as f32, self.animation);
+            self.lights
+                .iter_mut()
+                .for_each(|l| l.update(sec_since_midnight as f32, self.animation));
+            ui.ctx().request_repaint();
             let bitmap = self.paint();
             let window_size = ui.available_size();
             let mut img_ui = ui.child_ui(

@@ -110,7 +110,7 @@ impl GraphicDemo {
             .powf(self.light_parameters.m);
 
         let target_multiplier = match direction {
-            Some(vec) => Vector::cos(Vector::from(vec).multiply(-1.0), r_vec).max(0.0),
+            Some(vec) => Vector::cos(Vector::from(vec).multiply(-1.0), n_vec).max(0.0),
             None => 1.0,
         };
 

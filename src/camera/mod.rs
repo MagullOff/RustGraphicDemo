@@ -48,7 +48,10 @@ impl Default for Camera {
 }
 
 impl Movable for Camera {
-    fn update(&mut self, tick: f32) {
+    fn update(&mut self, tick: f32, animation: bool) {
+        if !animation {
+            return;
+        }
         let angle = get_angle(tick);
         match self.kind {
             CameraKind::Following => {

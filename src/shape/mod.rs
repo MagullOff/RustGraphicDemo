@@ -24,31 +24,33 @@ pub struct Shape {
 }
 
 impl Movable for Shape {
-    fn update(&mut self, tick: f32) {
+    fn update(&mut self, tick: f32, animation: bool) {
         match self.movement_type {
             ShapeMovementType::Static => {}
             ShapeMovementType::Orbital => {
-                let angle = get_angle(tick);
-                self.position[0] = SHAPE_ORBIT_RADIUS * angle.sin();
-                self.position[2] = SHAPE_ORBIT_RADIUS * angle.cos();
-                let mut new_polygons = self.polygons.clone();
-                let mut position = self.position;
-                if self.vibration {
-                    position.x += self.offset;
+                if animation {
+                    let angle = get_angle(tick);
+                    self.position[0] = SHAPE_ORBIT_RADIUS * angle.sin();
+                    self.position[2] = SHAPE_ORBIT_RADIUS * angle.cos();
+                    let mut new_polygons = self.polygons.clone();
+                    let mut position = self.position;
+                    if self.vibration {
+                        position.x += self.offset;
+                    }
+                    new_polygons
+                        .iter_mut()
+                        .for_each(|p| p.move_vertices(position));
+                    self.transformed_polygons = new_polygons;
+                    self.matrix = Matrix4::new_rotation_wrt_point(
+                        Vector3::from_vec(vec![0.0, angle - std::f32::consts::PI, 0.0]),
+                        Point3::new(
+                            self.position[0] as f32,
+                            self.position[1] as f32,
+                            self.position[2] as f32,
+                        ),
+                    );
+                    self.offset *= -1.0;
                 }
-                new_polygons
-                    .iter_mut()
-                    .for_each(|p| p.move_vertices(position));
-                self.transformed_polygons = new_polygons;
-                self.matrix = Matrix4::new_rotation_wrt_point(
-                    Vector3::from_vec(vec![0.0, angle - std::f32::consts::PI, 0.0]),
-                    Point3::new(
-                        self.position[0] as f32,
-                        self.position[1] as f32,
-                        self.position[2] as f32,
-                    ),
-                );
-                self.offset *= -1.0;
             }
         }
     }
