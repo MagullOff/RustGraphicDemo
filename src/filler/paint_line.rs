@@ -1,12 +1,11 @@
 use super::edge::Edge;
-use crate::app::ShadingType;
 use crate::consts::AMBIENT_KA;
 use crate::utils::types::{Point2, Point3, Vector3};
 use crate::utils::vector::Vector;
 use crate::GraphicDemo;
 use egui::{Color32, ColorImage};
 
-fn get_center(vertices: &[Point3]) -> Point3 {
+pub fn get_center(vertices: &[Point3]) -> Point3 {
     let length = vertices.len() as f32;
     let (x, y, z) = &vertices
         .iter()
@@ -17,7 +16,7 @@ fn get_center(vertices: &[Point3]) -> Point3 {
     Point3::new(x / length, y / length, z / length)
 }
 
-fn get_barocenttric_coordinates(vertices: &[Point3], point: Point2) -> (f32, f32, f32) {
+pub fn get_barocenttric_coordinates(vertices: &[Point3], point: Point2) -> (f32, f32, f32) {
     let (x1, y1) = (vertices[0][0] as i32, vertices[0][1] as i32);
     let (x2, y2) = (vertices[1][0] as i32, vertices[1][1] as i32);
     let (x3, y3) = (vertices[2][0] as i32, vertices[2][1] as i32);
@@ -29,7 +28,7 @@ fn get_barocenttric_coordinates(vertices: &[Point3], point: Point2) -> (f32, f32
     (w1, w2, w3)
 }
 
-fn to_color(vector: Vector) -> Color32 {
+pub fn to_color(vector: Vector) -> Color32 {
     Color32::from_rgb(
         (vector.x * 255.0) as u8,
         (vector.y * 255.0) as u8,
@@ -37,14 +36,15 @@ fn to_color(vector: Vector) -> Color32 {
     )
 }
 
-enum ColorInterpolation {
+#[derive(Clone, Copy)]
+pub enum ColorInterpolation {
     Phong,
     Gouraud([Vector; 3]),
     Constant(Color32),
 }
 
 impl GraphicDemo {
-    fn get_color_at(
+    pub fn get_color_at(
         &self,
         vertices: &[Point3],
         point: Point3,
@@ -154,25 +154,12 @@ impl GraphicDemo {
         viewport_vertices: &[Point3],
         rotated_vertices: &[Point3],
         normal_vectors: &[Vector3],
+        polygon_color: ColorInterpolation,
         y: i32,
         map: &mut ColorImage,
         zbuffor: &mut Vec<Vec<f32>>,
         color: Color32,
     ) {
-        let polygon_color = match self.shading_type {
-            ShadingType::Constant => ColorInterpolation::Constant(to_color(self.get_color_at(
-                rotated_vertices,
-                get_center(rotated_vertices),
-                normal_vectors,
-                color,
-            ))),
-            ShadingType::Phong => ColorInterpolation::Phong,
-            ShadingType::Gouraud => ColorInterpolation::Gouraud([
-                self.get_color_at(rotated_vertices, rotated_vertices[0], normal_vectors, color),
-                self.get_color_at(rotated_vertices, rotated_vertices[1], normal_vectors, color),
-                self.get_color_at(rotated_vertices, rotated_vertices[2], normal_vectors, color),
-            ]),
-        };
         for i in (0..=((aet.len() as i8) - 2)).step_by(2) {
             for x in (aet[i as usize].min as i32)..(aet[(i + 1) as usize].min as i32) {
                 let bacrocentric_coordinates =

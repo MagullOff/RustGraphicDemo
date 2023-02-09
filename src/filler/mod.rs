@@ -1,7 +1,9 @@
 use self::edge::Edge;
+use crate::app::ShadingType;
 use crate::utils::types::*;
 use crate::GraphicDemo;
 use egui::{Color32, ColorImage};
+use paint_line::*;
 use std::collections::HashMap;
 mod edge;
 mod paint_line;
@@ -32,6 +34,20 @@ impl GraphicDemo {
         zbuffor: &mut Vec<Vec<f32>>,
         color: Color32,
     ) {
+        let polygon_color = match self.shading_type {
+            ShadingType::Constant => ColorInterpolation::Constant(to_color(self.get_color_at(
+                rotated_vertices,
+                get_center(rotated_vertices),
+                normal_vectors,
+                color,
+            ))),
+            ShadingType::Phong => ColorInterpolation::Phong,
+            ShadingType::Gouraud => ColorInterpolation::Gouraud([
+                self.get_color_at(rotated_vertices, rotated_vertices[0], normal_vectors, color),
+                self.get_color_at(rotated_vertices, rotated_vertices[1], normal_vectors, color),
+                self.get_color_at(rotated_vertices, rotated_vertices[2], normal_vectors, color),
+            ]),
+        };
         let mut aet: Vec<Edge> = vec![];
         let mut edge_collection: HashMap<(usize, usize), i32> = HashMap::new();
 
@@ -90,6 +106,7 @@ impl GraphicDemo {
                 viewport_vertices,
                 rotated_vertices,
                 normal_vectors,
+                polygon_color,
                 y,
                 map,
                 zbuffor,
